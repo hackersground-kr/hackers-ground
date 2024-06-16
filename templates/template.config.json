@@ -1,0 +1,32 @@
+{
+  "registration": {
+    "confirmed": "registration/registrationConfirmed",
+    "error": "registration/registrationError"
+  },
+  "csc": {
+    "dailyCheckIn": "csc/dailyCheckIn",
+    "submitted": "csc/completionSubmitted",
+    "overdue": "csc/completionOverdue",
+    "invalidChallengeCode": "csc/completionInvalidChallengeCode",
+    "complete": "csc/completionComplete",
+    "incomplete": "csc/completionIncomplete",
+    "error": "csc/completionError",
+    "wrapUp": "csc/wrapUp"
+  },
+  "workshop": {
+    "announcement": "workshop/announcement",
+    "checkIn": "workshop/checkIn",
+    "wrapUp": "workshop/wrapUp"
+  },
+  "hackathon": {
+    "announcement": "hackathon/announcement",
+    "checkIn": "hackathon/checkIn",
+    "teamBuilding": "hackathon/teamBuilding",
+    "teamTopic": "hackathon/teamTopic",
+    "teamApp1": "hackathon/teamApp1",
+    "teamApp2": "hackathon/teamApp2",
+    "teamPitch": "hackathon/teamPitch",
+    "teamFinalAdvanced": "hackathon/teamFinalAdvanced",
+    "wrapUp": "hackathon/wrapUp"
+  }
+}
