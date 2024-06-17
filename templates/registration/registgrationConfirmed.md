@@ -3,7 +3,7 @@
 반갑습니다, {{NAME}}님! 해커그라운드 조직위원회입니다. 이벤트를 신청해주셔 감사합니다. 해커그라운드 해커톤 진행 과정을 정리해 공유합니다. 
 
 <div style="text-align: center;">
-  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/banner-1920x480.png" alt="해커그라운드 배너" width="100%"/>
+  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/banner-1920x480.png?raw=true" alt="해커그라운드 배너" width="100%"/>
 </div>
 
 [해커그라운드 해커톤](https://hackersground.kr)은 대구/경북 지역의 청년개발자들과 함께 Microsoft 애저 클라우드를 활용해 당면한 현안 문제를 해결합니다. 이번 여름, 여러분께선 IT서비스를 클라우드로 런칭할 수 있는 경험을 얻어갈 수 있습니다.
@@ -18,7 +18,7 @@
 3. [해커톤](https://hgrd.kr/hackathon-guide) - 8월 말
 
 <div style="text-align: center;">
-  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/hackers_ground_hackathon_curriculum.png" alt="해커그라운드 해커톤 행사 개요" width="80%"/>
+  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/hackers_ground_hackathon_curriculum.png?raw=true" alt="해커그라운드 해커톤 행사 개요" width="80%"/>
 </div>
 
 ## 팀빌딩

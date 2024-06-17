@@ -11,7 +11,7 @@
 
 
 <div style="text-align: center;">
-  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/eventRegistrationFail.png" alt="해커그라운드 해커톤 신청 실패 안내" width="100%"/>
+  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/eventRegistrationFail.png?raw=true" alt="해커그라운드 해커톤 신청 실패 안내" width="100%"/>
 </div>
 
 [해커그라운드 해커톤](https://hackersground.kr)은 대구/경북 지역의 청년개발자들과 함께 Microsoft 애저 클라우드를 활용해 당면한 현안 문제를 해결합니다. 이번 여름, 여러분께선 IT서비스를 클라우드로 런칭할 수 있는 경험을 얻어갈 수 있습니다.
