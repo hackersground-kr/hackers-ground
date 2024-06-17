@@ -1,6 +1,6 @@
 # Hackers Ground
 
-[![dev chat](https://discordapp.com/api/guilds/1112283537165529100/widget.png?style=shield)](https://aka.ms/hg/discord)
+[![dev chat](https://discordapp.com/api/guilds/1112283537165529100/widget.png?style=shield)](https://hgrd.kr/discord)
 
 안녕하세요, 해커그라운드와 마이크로소프트가 함께하는 2024 해커그라운드 해커톤 소식을 전해드립니다!
 
