@@ -6,6 +6,11 @@
 
 대구/경북 청년 IT개발자 100명이 모여 클라우드 기술을 사용해 지역사회 문제를 해결하는 멋진 기회에 도전하세요! 함께 성장하고 싶다면 아래 일정을 확인하세요.
 
+<div style="text-align: center;">
+  <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/banner-1920x480.png" alt="해커그라운드 배너" width="100%"/>
+</div>
+
+
 ### 해커톤 개요
 - **일시:** 2024년 8월 25일(일) ~ 8월 27일(화)
 - **장소:** 의성 빙계 얼음골 야영장
