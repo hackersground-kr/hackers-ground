@@ -10,6 +10,11 @@
 2. 심화교육 - 8월 초: https://hgrd.kr/workshop-guide
 3. 해커톤 - 8월 말: https://hgrd.kr/hackathon-guide
 
+[팀빌딩]
+기초교육과 심화교육을 통과한 분들에게 팀빌딩을 진행할 수 있는 기회가 주어집니다! 
+팀빌딩 안내: https://hgrd.kr/teambuilding-guide
+
+
 [궁금한 내용이 있어요!]
 진행하시며 어려운 부분들이 있으실 텐데 FAQ 페이지를 참고해주세요!
 faq: https://hgrd.kr/faq

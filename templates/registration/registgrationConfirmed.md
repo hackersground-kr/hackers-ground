@@ -21,6 +21,12 @@
   <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/hackers_ground_hackathon_curriculum.png" alt="해커그라운드 해커톤 행사 개요" width="80%"/>
 </div>
 
+## 팀빌딩
+
+기초교육과 심화교육을 통과한 분들에게 팀빌딩을 진행할 수 있는 기회가 주어집니다! 
+
+* [팀빌딩 안내](https://hgrd.kr/teambuilding-guide)
+
 
 ## FAQ
 
