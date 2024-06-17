@@ -26,13 +26,13 @@
 - ⏰ **[선택] 오프라인 기초교육:** [오프라인 기초교육 안내](https://hgrd.kr/csc-guide)
 - 🙆🏻‍♀️ **[필수] 오프라인 사전 워크샵:** [사전 워크샵 안내](https://hgrd.kr/workshop-guide)
 
-### 팀빌딩
+### 팀 빌딩
 
-- 👫 **안내:** [팀 빌딩 안내](https://hgrd.kr/teambuilding-guide)
+- 👫 **팀 빌딩:** [팀 빌딩 안내](https://hgrd.kr/teambuilding-guide)
 
 ### 해커톤
 - **내용:** 무박 3일 동안 즐겁게 코딩하며 클라우드로 IT 서비스를 구축, 배포, 운영합니다.
-- **안내:** [해커톤 안내](https://hgrd.kr/hackathon-guide)
+- **해커톤:** [해커톤 안내](https://hgrd.kr/hackathon-guide)
 
 해커그라운드 해커톤 2024와 함께 클라우드 기술로 지역사회 문제를 해결하고, 개발자로서 성장할 수 있는 기회를 놓치지 마세요! 많은 참여 바랍니다.
 
