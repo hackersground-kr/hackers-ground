@@ -5,12 +5,15 @@
   },
   "csc": {
     "dailyCheckIn": "csc/dailyCheckIn",
-    "submitted": "csc/completionSubmitted",
     "overdue": "csc/completionOverdue",
     "invalidChallengeCode": "csc/completionInvalidChallengeCode",
     "complete": "csc/completionComplete",
     "incomplete": "csc/completionIncomplete",
     "error": "csc/completionError",
+    "invalidgithubprofile" : "csc/completionInvalidGithubProfile",
+    "invalidmslearnprofile" : "csc/completionInvalidMSLearnProfile",
+    "registrationnotfound" : "csc/completionRegistrationNotFound",
+    "invalidinput" : "csc/completionInvalidInput",
     "wrapUp": "csc/wrapUp"
   },
   "workshop": {
