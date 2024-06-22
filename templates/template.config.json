@@ -10,10 +10,10 @@
     "complete": "csc/completionComplete",
     "incomplete": "csc/completionIncomplete",
     "error": "csc/completionError",
-    "invalidgithubprofile" : "csc/completionInvalidGithubProfile",
-    "invalidmslearnprofile" : "csc/completionInvalidMSLearnProfile",
-    "registrationnotfound" : "csc/completionRegistrationNotFound",
-    "invalidinput" : "csc/completionInvalidInput",
+    "invalidGitHubProfile" : "csc/completionInvalidGithubProfile",
+    "invalidMSLearnProfile" : "csc/completionInvalidMSLearnProfile",
+    "registrationNotFound" : "csc/registrationNotFound",
+    "invalidInput" : "csc/completionInvalidInput",
     "wrapUp": "csc/wrapUp"
   },
   "workshop": {

@@ -6,6 +6,13 @@
 
 {{ CSC_CHALLENGE_CODE }} 과정을 마치고 느낀 감정이나 어려웠던 점을 공유해주시면 더욱 좋겠어요.
 
+### 제출 데이터
+
+* 깃헙 프로필: {{ GITHUB_ID }}
+* Microsoft Learn 프로필: {{ CSC_MS_PROFILE }}
+* 클라우드 스킬 챌린지 토픽: {{ CSC_CHALLENGE_CODE }}
+
+
 ## ⛳️ 다음 단계
 
 - [클스챌 다른 주제 도전](https://github.com/hackersground-kr/hackers-ground/tree/main/csc)
