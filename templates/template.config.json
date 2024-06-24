@@ -6,14 +6,14 @@
   "csc": {
     "dailyCheckIn": "csc/dailyCheckIn",
     "overdue": "csc/completionOverdue",
-    "invalidChallengeCode": "csc/completionInvalidChallengeCode",
+    "invalidChallengeCode": "csc/invalidChallengeCode",
     "complete": "csc/completionComplete",
     "incomplete": "csc/completionIncomplete",
     "error": "csc/completionError",
-    "invalidGitHubProfile" : "csc/completionInvalidGithubProfile",
-    "invalidMSLearnProfile" : "csc/completionInvalidMSLearnProfile",
+    "invalidGitHubProfile" : "csc/invalidGithubProfile",
+    "invalidMSLearnProfile" : "csc/invalidMicrosoftLearnProfile",
     "registrationNotFound" : "csc/registrationNotFound",
-    "invalidInput" : "csc/completionInvalidInput",
+    "invalidInput" : "csc/invalidInput",
     "wrapUp": "csc/wrapUp"
   },
   "workshop": {
