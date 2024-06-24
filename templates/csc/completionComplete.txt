@@ -7,10 +7,10 @@
 {{ CSC_CHALLENGE_CODE }} 과정을 마치고 느꼈던 감정이나 어려웠던 점을 공유해주시면 더욱 좋겠어요.
 
 [ 제출하신 이슈 정보 ]
-1. 깃헙 프로필: {{ GITHUB_ID }}
-2. Microsoft Learn 프로필: {{ CSC_MS_PROFILE }}
+1. 깃헙 프로필 URL : {{ GITHUB_PROFILE }}
+2. Microsoft Learn 프로필 URL : {{ CSC_MS_PROFILE }}
 3. 클라우드 스킬 챌린지 토픽: {{ CSC_CHALLENGE_CODE }}
 4. 클라우드 스킬 챌린지 완주 현황
-: {{ CSC_CHALLENGE_LIST }}
+{{ CSC_CHALLENGE_LIST }}
 
 다음 단계도 화이팅입니다!
