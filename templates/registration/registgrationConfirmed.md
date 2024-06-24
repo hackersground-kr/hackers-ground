@@ -1,6 +1,6 @@
 # 해커그라운드 해커톤 신청 완료 안내
 
-반갑습니다, {{NAME}}님! 해커그라운드 조직위원회입니다. 이벤트를 신청해주셔 감사합니다. 해커그라운드 해커톤 진행 과정을 정리해 공유합니다. 
+반갑습니다, {{ NAME }}님! 해커그라운드 조직위원회입니다. 이벤트를 신청해주셔 감사합니다. 해커그라운드 해커톤 진행 과정을 정리해 공유합니다. 
 
 <div style="text-align: center;">
   <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/banner-1920x480.png?raw=true" alt="해커그라운드 배너" width="100%"/>
