@@ -1,6 +1,7 @@
 {
   "registration": {
     "confirmed": "registration/registrationConfirmed",
+    "validOnlyMobile" : "registration/validOnlyMobile",
     "error": "registration/registrationError"
   },
   "csc": {
