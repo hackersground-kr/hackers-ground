@@ -17,6 +17,31 @@
 [해커그라운드 해커톤](https://hackersground.kr)은 대구/경북 지역의 청년개발자들과 함께 Microsoft 애저 클라우드를 활용해 당면한 현안 문제를 해결합니다. 이번 여름, 여러분께선 IT서비스를 클라우드로 런칭할 수 있는 경험을 얻어갈 수 있습니다.
 
 
+## 제출 프로필
+
+### 사용자 입력
+
+* 이름: {{ NAME }}
+* 깃헙 프로필: {{ GITHUB_ID }}
+* Microsoft Learn 프로필: {{ MS_PROFILE }}
+* 전화번호: {{ MOBILE }}
+* 이메일: {{ E_MAIL }}
+* 오프라인 클스챌: {{ OFFLINE_CSC }}
+* 태어난 년도: {{ DATE_OF_YEAR }}
+
+### 모범답안
+
+아래 예시와 다른 경우엔 모든 응답이 반려됩니다.
+
+* 이름: 최해달
+* 깃헙 프로필: https://github.com/hackersground-kr
+* Microsoft Learn 프로필: https://learn.microsoft.com/ko-kr/users/10787806
+* 전화번호: 010-0000-0000
+* 이메일: events@hackersground.kr
+* 오프라인 클스챌: 체크한 날짜로 답변이 옵니다
+* 태어난 년도: 2000 혹은 1999
+
+
 ### FAQ
 
 진행하시며 어려운 부분들이 있으실 텐데 [FAQ 페이지](https://hgrd.kr/faq)를 참고해주세요!

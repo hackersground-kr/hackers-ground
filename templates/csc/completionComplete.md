@@ -8,14 +8,15 @@
 
 다음 단계도 화이팅입니다! 🎉🎉🎉💪💪💪
 
+
 ## 제출 프로필
 
 * 깃헙 프로필: {{ GITHUB_ID }}
 * Microsoft Learn 프로필: {{ CSC_MS_PROFILE }}
 * 클라우드 스킬 챌린지 토픽: {{ CSC_CHALLENGE_CODE }}
 * 클라우드 스킬 챌린지 완주 현황
+    * {{ CSC_CHALLENGE_LIST }}
 
-    : {{ CSC_CHALLENGE_LIST }}
 
 ## ⛳️ 다음 단계
 

@@ -21,11 +21,23 @@
   <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/hackers_ground_hackathon_curriculum.png?raw=true" alt="해커그라운드 해커톤 행사 개요" width="80%"/>
 </div>
 
+
 ## 팀빌딩
 
 기초교육과 심화교육을 통과한 분들에게 팀빌딩을 진행할 수 있는 기회가 주어집니다! 
 
 * [팀빌딩 안내](https://hgrd.kr/teambuilding-guide)
+
+
+## 제출 프로필
+
+* 이름: {{ NAME }}
+* 깃헙 프로필: {{ GITHUB_ID }}
+* Microsoft Learn 프로필: {{ MS_PROFILE }}
+* 전화번호: {{ MOBILE }}
+* 이메일: {{ E_MAIL }}
+* 오프라인 클스챌: {{ OFFLINE_CSC }}
+* 태어난 년도: {{ DATE_OF_YEAR }}
 
 
 ## FAQ
