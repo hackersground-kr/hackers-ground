@@ -35,13 +35,14 @@
 - **신청 폼:** [해커톤 신청하기](https://hgrd.kr/hackathon-register)
 - **기간:** 2024년 6월 19일(수) ~ 7월 28일(일)
 
-## 교육 관련 상세 가이드
 
-필수교육을 이수하셔야 해커톤에 참여하실 수 있습니다!
+# 해커톤 참여 3단계
 
-- ✉️ **[필수] 온라인 기초교육:** [온라인 기초교육 안내](https://hgrd.kr/csc-guide)
-- ⏰ **[선택] 오프라인 기초교육:** [오프라인 기초교육 안내](https://hgrd.kr/csc-guide)
-- 🙆🏻‍♀️ **[필수] 오프라인 사전 워크샵:** [사전 워크샵 안내](https://hgrd.kr/workshop-guide)
+아래 조건을 만족해야 팀빌딩과 해커톤에 참여하실 수 있습니다!
+
+1. [클라우드 스킬 챌린지](https://hgrd.kr/csc-guide)를 완주합니다
+2. [사전 워크샵](https://hgrd.kr/workshop-guide)에 참여해서 과제 완료합니다
+3. [클라우드 스킬 챌린지를 완주](https://hgrd.kr/csc-finish)하고 [사전워크샵 과제 통과](https://hgrd.kr/workshop-finish)한 사람들끼리 팀빌딩을 진행하고 해커톤에 참여합니다
 
 
 ### 팀 빌딩
