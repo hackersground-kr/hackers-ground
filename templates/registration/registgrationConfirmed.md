@@ -11,7 +11,7 @@
 
 ## IT서비스 런칭 경험이 있는 클라우드 개발자 양성 과정
 
-여러분들이 성장할 수 있는 과정을 준비했습니다. 해커톤까지 가기 위해선 아래 교육을 이수하고 과제를 통과하셔야 합니다. 상세 내용은 아래 문서를 읽어주세요. 이벤트 기한이 다가올 수록 내용이 자세하게 업데이트 됩니다.
+여러분들이 성장할 수 있는 과정을 준비했습니다. 해커톤까지 가기 위해선 아래 교육을 이수하고 과제를 통과하셔야 합니다. 이벤트 기한이 다가올 수록 업데이트된 내용은 아래 문서를 확인하세요.
 
 1. [기초교육 - 클라우드 스킬 챌린지](https://hgrd.kr/csc-guide) - 7월
 2. [심화교육 - 워크샵](https://hgrd.kr/workshop-guide) - 7월 말 ~ 8월 초
@@ -20,6 +20,15 @@
 <div style="text-align: center;">
   <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/hackers_ground_hackathon_curriculum.png?raw=true" alt="해커그라운드 해커톤 행사 개요" width="80%"/>
 </div>
+
+
+# 해커톤 참여 3단계
+
+아래 조건을 만족해야 해커톤에 참여하실 수 있습니다!
+
+1. [클라우드 스킬 챌린지](https://hgrd.kr/csc-guide)를 완주합니다
+2. [사전 워크샵](https://hgrd.kr/workshop-guide)에 참여해서 과제 완료합니다
+3. [클라우드 스킬 챌린지를 완주](https://hgrd.kr/csc-finish)하고 [사전워크샵 과제 통과](https://hgrd.kr/workshop-finish)한 사람들끼리 팀빌딩을 진행하고 해커톤에 참여합니다
 
 
 ## 팀빌딩
@@ -42,7 +51,7 @@
 
 ## FAQ
 
-진행하시며 어려운 부분들이 있으실 텐데 [FAQ 페이지](https://hgrd.kr/faq)를 참고해주세요!
+진행하시며 어려운 부분들이 있으실 텐데 [FAQ 페이지](https://hgrd.kr/faq)를 참고하세요!
 
 
 ## 기존 참여자들과 소통하기
