@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+
+    <IsTestProject>true</IsTestProject>
+
+    <AssemblyName>HackersGround.Csc.Trophies.ConsoleApp.Tests</AssemblyName> 
+    <RootNamespace>HackersGround.Csc.Trophies.ConsoleApp.Tests</RootNamespace> 
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="$(CoverletVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNetTestSdkVersion)" />
+    <PackageReference Include="MSTest.TestAdapter" Version="$(MSTestVersion)" />
+    <PackageReference Include="MSTest.TestFramework" Version="$(MSTestVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\HackersGround.Csc.Trophies.ConsoleApp\HackersGround.Csc.Trophies.ConsoleApp.csproj" />
+  </ItemGroup>
+
+</Project>
