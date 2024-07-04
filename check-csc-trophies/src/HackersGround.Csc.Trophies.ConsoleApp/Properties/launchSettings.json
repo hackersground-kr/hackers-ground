@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "AZ-900": {
+      "commandName": "Project",
+      "commandLineArgs": "-c AZ-900 -u https://learn.microsoft.com/ko-kr/users/jihyeonhwang-8335/"
+    },
+    "AI-900": {
+      "commandName": "Project",
+      "commandLineArgs": "-c AI-900 -u https://learn.microsoft.com/ko-kr/users/jihyeonhwang-8335/"
+    }
+  }
+}
