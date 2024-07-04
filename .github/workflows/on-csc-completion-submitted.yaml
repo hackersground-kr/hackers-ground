@@ -1,0 +1,789 @@
+name: On CSC Completion Submitted
+
+on:
+  issues:
+    types:
+      - opened
+  workflow_dispatch:
+    inputs:
+      issue-number:
+        description: "Issue number"
+        required: true
+      error-code:
+        description: "Error code. It should be between 0 and 4"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  verification:
+    name: "Verifying CSC completion"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check event payload
+        shell: pwsh
+        run: |
+          $eventPayload = '${{ toJson(github) }}'
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Get GitHub access token
+        id: github-connect
+        shell: pwsh
+        run: |
+          $token = ./gha-scripts/Get-GitHubAccessToken.ps1 `
+            -AccessTokenIDs "${{ vars.ACCESS_TOKEN_IDS }}" `
+            -ApimBaseUrl "${{ vars.APIM_BASE_URL }}" `
+            -ApimApiKey "${{ secrets.APIM_SUBSCRIPTION_KEY }}"
+
+          echo "::add-mask::$token"
+          echo "token=$token" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8
+
+      - name: Check issue details
+        id: issue
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.github-connect.outputs.token }}
+        run: |
+          $payload = '${{ toJson(github) }}'
+          $Issuenumber = "${{ github.event.inputs.issue-number }}"
+
+          $result = $(./gha-scripts/Check-IssueDetails.ps1 `
+            -IssueNumber "${{ github.event.inputs.issue-number }}" `
+            -DueDate "${{ vars.CSC_DUE_DATE }}" `
+            -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
+
+          $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
+          $dateSubmitted = [DateTimeOffset]::Parse($result.dateSubmitted).ToOffset($tz.GetUtcOffset($result.createdAt)).ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
+          $dateDue = [DateTimeOffset]::Parse($result.dateDue).ToOffset($tz.GetUtcOffset($result.createdAt)).ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
+
+          echo "issueNumber=$($result.issueNumber)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "issueType=$($result.issueType)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "challengeCode=$($result.challengeCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "isValidChallengeCode=$($result.isValidChallengeCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubProfile=$($result.githubProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "isValidGitHubProfile=$($result.isValidGitHubProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "microsoftLearnProfile=$($result.microsoftLearnProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "isValidMicrosoftLearnProfile=$($result.isValidMicrosoftLearnProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "dateSubmitted=$dateSubmitted" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "dateDue=$dateDue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "isOverdue=$($result.isOverdue)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      # - name: Debug issue details
+      #   shell: bash
+      #   run: |
+      #     echo "Issue number: ${{ steps.issue.outputs.issueNumber }}"
+      #     echo "Issue type: ${{ steps.issue.outputs.issueType }}"
+      #     echo "Challenge code: ${{ steps.issue.outputs.challengeCode }}"
+      #     echo "Is valid challenge code: ${{ steps.issue.outputs.isValidChallengeCode }}"
+      #     echo "GitHub ID: ${{ steps.issue.outputs.githubID }}"
+      #     echo "GitHub profile: ${{ steps.issue.outputs.githubProfile }}"
+      #     echo "Is valid GitHub profile: ${{ steps.issue.outputs.isValidGitHubProfile }}"
+      #     echo "Microsoft Learn profile: ${{ steps.issue.outputs.microsoftLearnProfile }}"
+      #     echo "Is valid Microsoft Learn profile: ${{ steps.issue.outputs.isValidMicrosoftLearnProfile }}"
+      #     echo "Date submitted: ${{ steps.issue.outputs.dateSubmitted }}"
+      #     echo "Date due: ${{ steps.issue.outputs.dateDue }}"
+      #     echo "Is overdue: ${{ steps.issue.outputs.isOverdue }}"
+
+      - name: Add a label - Overdue
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "overdue" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Overdue
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            * **이슈 제출 시각** : ${{ steps.issue.outputs.dateSubmitted }}
+            * **이슈 마감 시각** : ${{ steps.issue.outputs.dateDue }}
+
+            안타깝게도 제출하신 이슈는 **마감 기한인 ${{ steps.issue.outputs.dateDue }}**을 넘겼습니다. 😭
+            따라서, 이번 "기초교육 - 클라우드 스킬 챌린지" 완주에 반영할 수 없습니다.
+
+            이번 2024 해커그라운드 해커톤 본선 행사에는 참여하실 수 없지만, 다음 해커그라운드 해커톤에서는 꼭 완주하셔서 본선에서 만나요! 🚀
+
+            그동안 클라우드 스킬 챌린지 이벤트에 참여해 주셔서 감사합니다.
+
+            🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Close issue - Overdue
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "챌린지 제출 기한이 지났습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add a label - Invalid challenge code
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Invalid challenge code
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            제출하신 이슈의 제목과 본문 모두 정확한 챌린지 코드를 입력하셔야 합니다. 그렇지 않으면 확인을 할 수가 없습니다. 😱 입력하신 제목을 확인해 주세요!
+
+            * 제출 챌린지 코드: `${{ steps.issue.outputs.challengeCode }}`
+            * 예상 챌린지 코드: `AZ-900`, `AI-900`
+
+            챌린지 코드는 위에 언급한 두 가지 중 하나여야 합니다.
+
+            이 이슈는 자동으로 닫힐 예정이니, **새롭게 이슈를 생성**해 주세요.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Close issue - Invalid challenge code
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "챌린지 코드를 확인할 수 없습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add a label - Invalid GitHub profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidGitHubProfile == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Invalid GitHub profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidGitHubProfile == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            안타깝게도 제출하신 **GitHub Profile 주소**를 확인할 수 없습니다. 😱
+
+            * 제출 GitHub Profile: `${{ steps.issue.outputs.githubProfile }}`
+
+            다시 한 번 GitHub Profile 주소를 확인해주세요.
+
+            이 이슈는 자동으로 닫힐 예정이니, **새롭게 이슈를 생성**해 주세요.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Close issue - Invalid GitHub profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidGitHubProfile == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "GitHub Profile 주소를 확인할 수 없습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add a label - Invalid Microsoft Learn profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidMicrosoftLearnProfile == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Invalid Microsoft Learn profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidMicrosoftLearnProfile == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            안타깝게도 제출하신 **Microsoft Learn Profile 주소**를 확인할 수 없습니다. 😱
+
+            * 제출 Microsoft Learn Profile: `${{ steps.issue.outputs.microsoftLearnProfile }}`
+
+            다시 한 번 Microsoft Learn Profile 주소를 확인해주세요.
+
+            이 이슈는 자동으로 닫힐 예정이니, **새롭게 이슈를 생성**해 주세요.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Close issue - Invalid Microsoft Learn profile
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidMicrosoftLearnProfile == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "Microsoft Learn Profile 주소를 확인할 수 없습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Call Power Automate workflow to verify GitHub ID and MS Learn Profile ID from the registration details
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidGitHubProfile == 'true' &&
+          steps.issue.outputs.isValidMicrosoftLearnProfile == 'true'
+        id: registration-verification
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.PAU_ON_REGISTRATION_VERIFICATION_REQUESTED_URL }}
+          method: "POST"
+          data: '{ "issueType": "${{ steps.issue.outputs.issueType }}", "githubProfile": "${{ steps.issue.outputs.githubProfile }}", "microsoftLearnProfile": "${{ steps.issue.outputs.microsoftLearnProfile }}" }'
+
+      - name: Check registration details
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.issue.outputs.isValidGitHubProfile == 'true' &&
+          steps.issue.outputs.isValidMicrosoftLearnProfile == 'true'
+        id: registration-verification-result
+        shell: pwsh
+        run: |
+          $result = '${{ steps.registration-verification.outputs.response }}' | ConvertFrom-Json
+
+          echo "isValidRegistration=$($result.isValidRegistration)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Add a label - Invalid registration details
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "invalid" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Invalid registration details
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            안타깝게도 제출하신 정보로 신청한 참가자를 찾을 수 없습니다. 😱
+
+            * 제출 GitHub Profile: `${{ steps.issue.outputs.githubProfile }}`
+            * 제출 Microsoft Learn Profile: `${{ steps.issue.outputs.microsoftLearnProfile }}`
+
+            해커톤 등록 정보를 확인하신 후, **새롭게 이슈를 생성**해 주세요.
+
+            다시 이슈를 생성했는데도 같은 문제가 발생한다면, 참가 등록 절차부터 다시 시작해 주세요.
+
+            참가 등록 👉 [https://hgrd.kr/hackathon-register](https://hgrd.kr/hackathon-register)
+
+            이후, 이 이슈는 자동으로 닫힐 예정입니다.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Close issue - Invalid registration details
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "등록 정보를 확인할 수 없습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add a label - Acknowledge
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+            --add-label "csc,${{ steps.issue.outputs.challengeCode }},verifying" \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - Acknowledge
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          emoji: "+1,rocket"
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            ${{ steps.issue.outputs.ChallengeCode }} 챌린지 완료 이슈를 생성해 주셔서 감사합니다! 🎉
+
+            생성해주신 이슈는 현재 확인 중이며, 완주 여부를 확인한 후 다시 알려드리겠습니다.
+
+            참가자님의 해커톤 완주를 응원해요! 💪🏼
+
+            🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Check trophies
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true'
+        id: check-trophies
+        shell: pwsh
+        run: |
+          $errorCode = "${{ github.event.inputs.error-code }}"
+          $forceError = if ($errorCode -eq '') { $false } else { $true }
+
+          pushd ./check-csc-trophies
+
+          dotnet restore && dotnet build
+
+          $playwright = Get-ChildItem -File Microsoft.Playwright.dll -Path . -Recurse
+          $installer = "$($playwright[0].Directory.FullName)/playwright.ps1"
+          & "$installer" install
+
+          if ($forceError -eq $true) {
+            $result = dotnet run `
+              --project ./src/HackersGround.Csc.Trophies.ConsoleApp `
+              -- `
+              -c ${{ steps.issue.outputs.challengeCode }} `
+              -u ${{ steps.issue.outputs.microsoftLearnProfile }} `
+              --force-error `
+              --error-code $errorCode | ConvertFrom-Json
+          } else {
+            $result = dotnet run `
+              --project ./src/HackersGround.Csc.Trophies.ConsoleApp `
+              -- `
+              -c ${{ steps.issue.outputs.challengeCode }} `
+              -u ${{ steps.issue.outputs.microsoftLearnProfile }} | ConvertFrom-Json
+          }
+
+          echo "challengeCode=$($result.challengeCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "challengeStatus=$($result.challengeStatus)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "challengeMessage=$($result.message)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+          popd
+
+      - name: Add label - FAILED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'FAILED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "failed" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - FAILED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'FAILED'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            저희 쪽에서 확인하는 중에 문제가 발생했습니다❗
+
+            최대한 빨리 확인한 후 다시 알려드리겠습니다.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Get random inspector
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'FAILED'
+        id: inspector
+        shell: pwsh
+        run: |
+          $inspector = ./get-randomassignee/Get-RandomAssignee.ps1 -Assignees "${{ vars.INSPECTORS }}"
+
+          echo "githubId=$inspector" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Assign an inspector
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'FAILED'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "add-assignees"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          assignees: ${{ steps.inspector.outputs.githubId }}
+
+      - name: Add label - INVALID
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'INVALID'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "invalid" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - INVALID
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'INVALID'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            입력하신 값이 올바르지 않습니다. 😭
+
+            다시 한 번 확인해 주세요❗
+
+            이 이슈는 자동으로 닫힐 예정이니, **새롭게 이슈를 생성**해 주세요.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Remove label - INVALID
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'INVALID'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --remove-label "verifying" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Close issue - INVALID
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'INVALID'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "입력 값이 올바르지 않습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add label - NOT_COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'NOT_COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "incomplete" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - NOT_COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'NOT_COMPLETED'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            확인 결과 ${{ steps.issue.outputs.challengeCode }}의 아직 끝내지 않은 모듈이 있습니다. 😭
+
+            ${{ steps.issue.outputs.challengeCode }}의 모든 모듈을 완료 하신 후 이슈를 생성해주세요❗
+
+            이 이슈는 자동으로 닫힐 예정이니, **새롭게 이슈를 생성**해 주세요.
+
+             🔹 해커그라운드 운영진 일동 🔹
+
+      - name: Remove label - NOT_COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'NOT_COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --remove-label "verifying" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Close issue - NOT_COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'NOT_COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "모듈 완주 기록을 확인할 수 없습니다. 이슈를 닫습니다." \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Add label - COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "verified" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'COMPLETED'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          emoji: "+1,rocket"
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            ${{ steps.issue.outputs.challengeCode }}의 모든 모듈을 완주하셨습니다!
+
+            축하드려요. 🎉🎉🎉
+
+      - name: Remove label - COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --remove-label "verifying" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment and close issue - COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'COMPLETED'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "축하드립니다, @${{ steps.issue.outputs.githubID }}님!
+
+            ${{ steps.issue.outputs.challengeCode }} 과정을 완주하셨습니다!!
+
+            ${{ steps.issue.outputs.challengeCode }} 과정을 마치고 느꼈던 감정이나 어려웠던 점을 디스코드 채널에 공유해주시면 더욱 좋겠어요.
+
+            앞으로도 화이팅하세요!🎉🎉🎉💪💪💪
+
+             🔹 해커그라운드 운영진 일동 🔹 " \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Post message to Discord
+        if: |
+          steps.issue.outputs.issueType == 'CSC' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.issue.outputs.isValidChallengeCode == 'true' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.check-trophies.outputs.challengeStatus == 'COMPLETED'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          args: "GitHub ID @${{ steps.issue.outputs.githubID }}님께서 ${{ steps.issue.outputs.challengeCode }} 과정을 완주하셨습니다."
+
+      - name: Set challenge status
+        if: |
+          steps.issue.outputs.issueType == 'CSC'
+        id: challenge-status
+        shell: pwsh
+        run: |
+          $result = if ("${{ steps.issue.outputs.isOverdue }}" -eq "true") {
+            'OVERDUE'
+          } elseif ("${{ steps.issue.outputs.isValidChallengeCode }}" -eq "false") {
+            'INVALID_CHALLENGE_CODE'
+          } elseif ("${{ steps.issue.outputs.isValidGitHubProfile }}" -eq "false") {
+            'INVALID_GITHUB_PROFILE'
+          } elseif ("${{ steps.issue.outputs.isValidMicrosoftLearnProfile }}" -eq "false") {
+            'INVALID_MICROSOFT_LEARN_PROFILE'
+          } elseif ("${{ steps.registration-verification-result.outputs.isValidRegistration }}" -eq "false") {
+            'REGISTRATION_NOT_FOUND'
+          } elseif ("${{ steps.check-trophies.outputs.challengeStatus }}" -eq "INVALID") {
+            'INVALID_INPUT'
+          } elseif ("${{ steps.check-trophies.outputs.challengeStatus }}" -eq "NOT_COMPLETED") {
+            'NOT_COMPLETED'
+          } elseif ("${{ steps.check-trophies.outputs.challengeStatus }}" -eq "COMPLETED") {
+            'COMPLETED'
+          } else {
+            'SOMETHING_WENT_WRONG'
+          }
+
+          echo "value=$result" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Call Power Automate workflow
+        if: |
+          steps.issue.outputs.issueType == 'CSC'
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.PAU_ON_CSC_SUBMITTED_URL }}
+          method: "POST"
+          data: '{ "githubId": "${{ steps.issue.outputs.githubID }}", "challengeCode": "${{ steps.issue.outputs.challengeCode }}", "challengeStatus": "${{ steps.challenge-status.outputs.value }}", "dateDue": "${{ steps.issue.outputs.dateDue }}", "dateSubmitted": "${{ steps.issue.outputs.dateSubmitted }}", "githubProfileUrl": "${{ steps.issue.outputs.githubProfile }}", "microsoftLearnProfileUrl": "${{ steps.issue.outputs.microsoftLearnProfile }}" }'
