@@ -1,0 +1,50 @@
+name: '토픽별 클라우드 스킬 챌린지 완료 인증'
+description: '토픽별 클라우드 스킬 챌린지 완료 인증용 템플릿'
+title: "[**챌린지 코드**] 챌린지 완료 인증"
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      **👆👆👆 상단의 제목에 챌린지 코드를 반드시 적어 주세요 👆👆👆**
+
+      클라우드 스킬 챌린지를 완료하신 분들은 이슈를 통해 인증을 받을 수 있습니다. 아래의 템플릿을 작성하여 이슈를 등록해 주세요.
+
+      **이슈 하나당 챌린지 하나씩 인증 가능합니다**
+
+- type: dropdown
+  id: title
+  attributes:
+    label: '제목'
+    options:
+      - '클라우드 스킬 챌린지'
+    default: 0
+
+- type: dropdown
+  id: challenge_code
+  attributes:
+    label: '챌린지 코드'
+    description: '완료한 챌린지 코드를 선택해 주세요. (예: AZ-900 또는 AI-900)'
+    options:
+      - '챌린지 코드 선택'
+      - 'AZ-900'
+      - 'AI-900'
+    default: 0
+
+- type: input
+  id: github_id
+  attributes:
+    label: 'GitHub 프로필 URL'
+    description: 'GitHub 프로필 주소를 입력해 주세요. (예: https://github.com/hackersground-kr)'
+    placeholder: 'GitHub 프로필 주소를 입력해 주세요. (예: https://github.com/hackersground-kr)'
+  validations:
+    required: true
+
+- type: input
+  id: learn_profile
+  attributes:
+    label: 'Microsoft Learn 프로필 URL'
+    description: 'Microsoft Learn 프로필 주소를 입력해 주세요. (예: https://learn.microsoft.com/ko-kr/users/hackersground-kr)'
+    placeholder: 'Microsoft Learn 프로필 주소를 입력해 주세요. (예: https://learn.microsoft.com/ko-kr/users/hackersground-kr)'
+  validations:
+    required: true
