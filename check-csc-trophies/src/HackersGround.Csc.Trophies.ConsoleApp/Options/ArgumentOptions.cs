@@ -1,3 +1,4 @@
+using System;
 using HackersGround.Csc.Trophies.ConsoleApp.Models;
 
 namespace HackersGround.Csc.Trophies.ConsoleApp.Options;
