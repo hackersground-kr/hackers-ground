@@ -437,7 +437,6 @@ jobs:
 
           pushd ./check-csc-trophies
           
-          pwsh Get-Location
           dotnet restore && dotnet build
           
           $playwright = Get-ChildItem -File Microsoft.Playwright.dll -Path . -Recurse
