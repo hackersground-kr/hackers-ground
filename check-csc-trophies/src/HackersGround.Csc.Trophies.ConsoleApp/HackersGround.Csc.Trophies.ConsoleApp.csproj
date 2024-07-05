@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageReference Include="Microsoft.Playwright" Version="$(MicrosoftPlaywrightVersion)" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.45.0" />
   </ItemGroup>
 
 </Project>
