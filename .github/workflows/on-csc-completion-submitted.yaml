@@ -459,8 +459,7 @@ jobs:
               --project ./src/HackersGround.Csc.Trophies.ConsoleApp `
               -- `
               -c ${{ steps.issue.outputs.challengeCode }} `
-              -u ${{ steps.issue.outputs.microsoftLearnProfile }} 
-            $result = $result | ConvertFrom-Json
+              -u ${{ steps.issue.outputs.microsoftLearnProfile }} | ConvertFrom-Json
           }
 
           echo "challengeCode=$($result.challengeCode)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
