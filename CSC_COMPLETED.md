@@ -8,7 +8,7 @@
 
 1. **GitHub 이슈 제출**: 완주하신 클라우드 스킬 챌린지 (AI-900, AZ-900)에 대한 [GitHub 이슈를 생성](https://github.com/hackersground-kr/hackers-ground/issues/new/choose)해 주세요. 이슈 제목과 본문에는 각 챌린지 코드와 완료한 내용을 명확하게 기술해야 합니다.
    <div style="text-align: center;">
-      <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/csc_issue.jpg?raw=true" alt="클스챌 완주 이슈 예시" width="100%"/>
+      <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/csc_issue_3.jpg?raw=true" alt="클스챌 완주 이슈 예시" width="100%"/>
     </div>
     <div style="text-align: center;">
       <img src="https://github.com/hackersground-kr/hackers-ground/blob/main/templates/images/csc_issue_2.jpg?raw=true" alt="클스챌 완주 이슈 예시" width="100%"/>
