@@ -4,7 +4,7 @@
     <IsPackable>false</IsPackable>
 
     <IsTestProject>true</IsTestProject>
-    <TargetFramework>net8.0</TargetFramework>
+    
     <AssemblyName>HackersGround.Csc.Trophies.ConsoleApp.Tests</AssemblyName> 
     <RootNamespace>HackersGround.Csc.Trophies.ConsoleApp.Tests</RootNamespace> 
   </PropertyGroup>
