@@ -436,10 +436,11 @@ jobs:
           $forceError = if ($errorCode -eq '') { $false } else { $true }
 
           pushd ./check-csc-trophies
+          
+          Get-Location
 
           dotnet restore && dotnet build
           
-          Get-Location
 
           $playwright = Get-ChildItem -File Microsoft.Playwright.dll -Path . -Recurse
 
