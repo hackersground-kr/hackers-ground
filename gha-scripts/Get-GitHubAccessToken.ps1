@@ -1,19 +1,19 @@
 # Gets the GitHub access token
 Param(
     [string]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $AccessTokenIDs = "",
 
     [string]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $ApimBaseUrl = "",
 
     [string]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $ApimApiKey = "",
 
     [switch]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $Help
 )
 
