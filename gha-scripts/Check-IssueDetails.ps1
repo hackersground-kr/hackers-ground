@@ -77,8 +77,7 @@ if ($eventName -eq "workflow_dispatch") {
     $title = $GitHubPayload.title
     $githubID = $GitHubPayload.user.login
     $createdAt = $GitHubPayload.created_at.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
-}
-else {
+} else {
     $IssueNumber = $GitHubPayload.event.issue.number
     $body = $GitHubPayload.event.issue.body
     $title = $GitHubPayload.event.issue.title
@@ -94,20 +93,15 @@ $issue = @{}
 $issue.Add("title", $segments[1].Trim())
 $issue.title = if ($issue.title -eq "클라우드 스킬 챌린지") {
     "Cloud Skills Challenge"
-}
-elseif ($issue.title -eq "사전 워크샵") {
+} elseif ($issue.title -eq "사전 워크샵") {
     "Workshop"
-}
-elseif ($issue.title -eq "팀 주제 제출") {
+} elseif ($issue.title -eq "팀 주제 제출") {
     "Team Topic"
-}
-elseif ($issue.title -eq "팀 앱 제출") {
+} elseif ($issue.title -eq "팀 앱 제출") {
     "Team App"
-}
-elseif ($issue.title -eq "팀 발표자료 제출") {
+} elseif ($issue.title -eq "팀 발표자료 제출") {
     "Team Pitch"
-}
-else {
+} else {
     $issue.title
 }
 
@@ -125,8 +119,7 @@ $sections | ForEach-Object {
                 $issue.Add("microsoftLearnProfile", $segments[1].Trim())
             }
         }
-    }
-    elseif ($issue.title -eq "사전 워크샵") {
+    } elseif ($issue.title -eq "사전 워크샵") {
         switch ($segments[0].Trim()) {
             "GitHub 프로필 URL" {
                 $issue.Add("githubProfile", $segments[1].Trim())
@@ -144,8 +137,7 @@ $sections | ForEach-Object {
                 $issue.Add("dashboardUrl", $segments[1].Trim())
             }
         }
-    }
-    else {
+    } else {
         switch ($segments[0].Trim()) {
             "팀 이름" {
                 $issue.Add("teamName", $segments[1].Trim())
@@ -183,58 +175,53 @@ $dateDueValue = $dateDue.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 $isValidGitHubProfile = $($($issue.githubProfile).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubProfile).TrimEnd("/").EndsWith($githubID) -eq $true)
 $isValidMicrosoftLearnProfile = if ($issueType -eq "CSC") {
     $($issue.microsoftLearnProfile).StartsWith("https://learn.microsoft.com/ko-kr/users/") -eq $true
-}
-else {
+} else {
     $false
 }
 $isValidGitHubRepository = if ($issueType -eq "WORKSHOP") {
     $($($issue.githubRepository).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubRepository).Contains("/$gitHubID/") -eq $true)
-}
-else {
+} else {
     $false
 }
 $isValidFrontendUrl = if ($issueType -eq "WORKSHOP") {
     $($($issue.frontendUrl).StartsWith("https://")) -and $($($issue.frontendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
-}
-else {
+ } else {
     $false
 }
 $isValidBackendUrl = if ($issueType -eq "WORKSHOP") {
     $($($issue.backendUrl).StartsWith("https://")) -and $($($issue.backendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
-}
-else {
+} else {
     $false
 }
 $isValidDashboardUrl = if ($issueType -eq "WORKSHOP") {
     $($($issue.dashboardUrl).StartsWith("https://")) -and $($($issue.dashboardUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
-}
-else {
+} else {
     $false
 }
 
 $result = @{
-    issueNumber                  = $IssueNumber;
-    issueType                    = $issueType;
-    createdAt                    = $createdAt;
-    title                        = $issue.title;
-    challengeCode                = $issue.challengeCode;
-    isValidChallengeCode         = $isValidChallengeCode;
-    githubID                     = $githubID;
-    githubProfile                = $issue.githubProfile;
-    isValidGitHubProfile         = $isValidGitHubProfile;
-    microsoftLearnProfile        = $issue.microsoftLearnProfile;
+    issueNumber = $IssueNumber;
+    issueType = $issueType;
+    createdAt = $createdAt;
+    title = $issue.title;
+    challengeCode = $issue.challengeCode;
+    isValidChallengeCode = $isValidChallengeCode;
+    githubID = $githubID;
+    githubProfile = $issue.githubProfile;
+    isValidGitHubProfile = $isValidGitHubProfile;
+    microsoftLearnProfile = $issue.microsoftLearnProfile;
     isValidMicrosoftLearnProfile = $isValidMicrosoftLearnProfile;
-    dateSubmitted                = $dateSubmittedValue;
-    dateDue                      = $dateDueValue;
-    isOverdue                    = $isOverdue;
-    githubRepository             = $issue.githubRepository;
-    isValidGitHubRepository      = $isValidGitHubRepository;
-    frontendUrl                  = $issue.frontendUrl;
-    isValidFrontendUrl           = $isValidFrontendUrl;
-    backendUrl                   = $issue.backendUrl;
-    isValidBackendUrl            = $isValidBackendUrl;
-    dashboardUrl                 = $issue.dashboardUrl;
-    isValidDashboardUrl          = $isValidDashboardUrl;
+    dateSubmitted = $dateSubmittedValue;
+    dateDue = $dateDueValue;
+    isOverdue = $isOverdue;
+    githubRepository = $issue.githubRepository;
+    isValidGitHubRepository = $isValidGitHubRepository;
+    frontendUrl = $issue.frontendUrl;
+    isValidFrontendUrl = $isValidFrontendUrl;
+    backendUrl = $issue.backendUrl;
+    isValidBackendUrl = $isValidBackendUrl;
+    dashboardUrl = $issue.dashboardUrl;
+    isValidDashboardUrl = $isValidDashboardUrl;
 }
 
 Write-Output $($result | ConvertTo-Json -Depth 100)

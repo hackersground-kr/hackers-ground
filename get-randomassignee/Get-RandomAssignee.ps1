@@ -1,11 +1,11 @@
 # Get a random assignee from a list of assignees
 Param(
     [string]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $Assignees = "",
 
     [switch]
-    [Parameter(Mandatory = $false)]
+    [Parameter(Mandatory=$false)]
     $Help
 )
 
