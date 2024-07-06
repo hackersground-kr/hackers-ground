@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace HackersGround.Csc.Trophies.ConsoleApp.Configs;
 
 /// <summary>

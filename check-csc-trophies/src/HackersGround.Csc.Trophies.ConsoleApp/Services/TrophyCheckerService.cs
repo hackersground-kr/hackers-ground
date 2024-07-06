@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+
 using HackersGround.Csc.Trophies.ConsoleApp.Configs;
 using HackersGround.Csc.Trophies.ConsoleApp.Models;
 using HackersGround.Csc.Trophies.ConsoleApp.Options;
