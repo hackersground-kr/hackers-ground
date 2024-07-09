@@ -20,6 +20,17 @@
   "workshop": {
     "announcement": "workshop/announcement",
     "checkIn": "workshop/checkIn",
+    "overdue": "workshop/completionOverdue",
+    "invalidGitHubProfile" : "workshop/invalidGitubProfile",
+    "invalidGitHubRepository" : "workshop/invalidGithubRepository",
+    "invalidFrontAppUrl": "workshop/invalidFrontAppUrl",
+    "invalidBackendAppUrl": "workshop/invalidBackendAppUrl",
+    "invalidDashboardAppUrl": "workshop/invalidDashboardAppUrl",
+    "registrationNotFound" : "workshop/registrationNotFound",
+    "error": "workshop/completionError",
+    "invalidInput" : "workshop/invalidInput",
+    "complete": "workshop/completionComplete",
+    "incomplete": "workshop/completionIncomplete",
     "wrapUp": "workshop/wrapUp"
   },
   "hackathon": {
@@ -32,5 +43,8 @@
     "teamPitch": "hackathon/teamPitch",
     "teamFinalAdvanced": "hackathon/teamFinalAdvanced",
     "wrapUp": "hackathon/wrapUp"
+  },
+  "participant":{
+    "checkParticipants": "participant/checkParticipants"
   }
 }
