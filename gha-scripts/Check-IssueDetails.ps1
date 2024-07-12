@@ -172,6 +172,7 @@ $isOverdue = "$($dateSubmitted -gt $dateDue)".ToLowerInvariant()
 $dateSubmittedValue = $dateSubmitted.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 $dateDueValue = $dateDue.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 
+$issue.githubProfile = $issue.githubProfile.Split('?')[0] 
 $isValidGitHubProfile = $($($issue.githubProfile).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubProfile).TrimEnd("/").EndsWith($githubID) -eq $true)
 $isValidMicrosoftLearnProfile = if ($issueType -eq "CSC") {
     $($issue.microsoftLearnProfile).StartsWith("https://learn.microsoft.com/ko-kr/users/") -eq $true
