@@ -1,0 +1,4 @@
+# 사전워크샵 체크인
+
+* 이름: {{ NAME }}
+* Github ID: {{ GITHUB_ID }}
