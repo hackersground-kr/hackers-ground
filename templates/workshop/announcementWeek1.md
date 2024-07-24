@@ -1,4 +1,4 @@
-# 사전 워크샵 안내
+# 사전 워크샵 {{ WORKSHOP_ASSIGN_NUMBER }}회차 안내
 
 안녕하세요 {{ NAME }}님! 
 
