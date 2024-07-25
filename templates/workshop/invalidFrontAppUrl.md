@@ -1,11 +1,8 @@
-
-프론트 url 형태가 잘못됨
-
 # [사전워크샵] 입력하신 프론트엔드 앱 URL이 정확하지 않습니다.
 
-👋🏼 {{ NAME }} 님!
+안녕하세요 {{ NAME }} 님!
 
-안타깝게도 제출하신 이슈에 정확한 프론트엔드 앱 URL가 포함되어 있지 않아 확인을 할 수 없습니다. 😱
+안타깝게도 제출하신 이슈에 정확한 프론트엔드 앱 URL가 포함되어 있지 않아 확인을 할 수 없습니다.
 
 * 제출 프론트엔드 앱 URL: {{ FRONT_APP_URL }}
 * 예상 프론트엔드 앱 URL: https://webapp.howsweet-fcd6fb4e.koreacentral.azurecontainerapps.io
