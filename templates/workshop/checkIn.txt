@@ -6,7 +6,7 @@
 
 * 이름: {{ NAME }}
 * Github ID: {{ GITHUB_ID }}
-* E-Mail: {{ E-mail }}
+* E-Mail: {{ E-MAIL }}
 
 
 <사전워크샵 준비>
