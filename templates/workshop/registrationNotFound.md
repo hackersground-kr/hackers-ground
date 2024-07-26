@@ -6,8 +6,7 @@
 
 ## 제출 프로필
 
-깃헙 프로필: {{ GITHUB_ID }}
-Microsoft Learn 프로필: {{ CSC_MS_PROFILE }}
+깃헙 프로필: {{ GITHUB_PROFILE }}
 
 해커톤 등록 정보를 확인하신 후, **새롭게 이슈를 생성**하세요.
 
