@@ -17,4 +17,4 @@
 <사전워크샵 콘텐츠>
 클라우드 배포를 공부할 콘텐츠입니다. 아래 링크를 참고하세요.
 1. 사전워크샵 레포: https://hgrd.kr/workshop-repo
-2. 사전워크샵 첼린지: https://hgrd.kr/workshop-challenge
+2. 사전워크샵 챌린지: https://hgrd.kr/workshop-challenge

@@ -14,7 +14,6 @@
 * 백엔드 앱 URL: {{ BACKEND_APP_URL }}
 * 대시보드 앱 URL: {{ DASHBOARD_APP_URL }}
 
-
 <다음 단계>
 - 팀빌딩: https://hgrd.kr/teambuilding-guide
 - 해커톤: https://hgrd.kr/hackathon-guide

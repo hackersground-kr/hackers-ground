@@ -30,6 +30,7 @@ public class TrophyCheckService(ChallengeSettings settings) : ITrophyCheckerServ
 {
     private readonly ChallengeSettings _settings = settings ?? throw new ArgumentNullException(nameof(settings));
 #pragma warning disable IDE1006 // Naming Styles
+
     private static readonly List<Exception> exceptions = new()
     {
         new ArgumentException("TEST: No challenge code identified. It MUST be either AZ-900 or AI-900"),
@@ -38,6 +39,7 @@ public class TrophyCheckService(ChallengeSettings settings) : ITrophyCheckerServ
         new ArgumentException("TEST: No trophies found."),
         new Exception("TEST: An error occurred."),
     };
+
 #pragma warning restore IDE1006 // Naming Styles
 
     private static JsonSerializerOptions jso => new()
@@ -60,7 +62,9 @@ public class TrophyCheckService(ChallengeSettings settings) : ITrophyCheckerServ
 
         var payload = new ChallengeResultModel()
         {
-            ChallengeCode = options.ChallengeCode.GetValueOrDefault()
+            ChallengeCode = options.ChallengeCode.GetValueOrDefault(),
+            ChallengeStatus = ChallengeStatusType.NotCompleted,
+            Message = "Not all modules are completed."
         };
 
         try
@@ -112,24 +116,27 @@ public class TrophyCheckService(ChallengeSettings settings) : ITrophyCheckerServ
             }
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            var modules = this._settings[options.ChallengeCode.ToString()];
+            var years = this._settings[options.ChallengeCode.ToString()];
 #pragma warning restore CS8604 // Possible null reference argument.
             List<string> complete = [];
-            foreach (var module in modules)
+            foreach (var year in years.Keys.OrderByDescending(p => p))
             {
-                if (trophies.Contains(module) == true)
+                var modules = years[year];
+                foreach (var module in modules)
                 {
-                    complete.Add(module);
+                    if (trophies.Contains(module) == true)
+                    {
+                        complete.Add(module);
+                    }
+                }
+
+                if (complete.Count == modules.Count)
+                {
+                    payload.ChallengeStatus = ChallengeStatusType.Completed;
+                    payload.Message = "All modules are completed";
+                    break;
                 }
             }
-
-            payload.ChallengeStatus = modules.Count == complete.Count
-                ? ChallengeStatusType.Completed
-                : ChallengeStatusType.NotCompleted;
-
-            payload.Message = payload.ChallengeStatus == ChallengeStatusType.Completed
-                ? "All modules are completed"
-                : $"Not all modules are completed. Missing modules: {string.Join(", ", modules.Except(complete))}";
 
             Console.WriteLine(JsonSerializer.Serialize(payload, jso));
         }
