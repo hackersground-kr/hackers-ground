@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

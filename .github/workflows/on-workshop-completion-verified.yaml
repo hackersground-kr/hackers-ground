@@ -1,0 +1,149 @@
+name: On Workshop Completion Verified
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  completion:
+    name: "Completing Workshop verification"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check event payload
+        shell: pwsh
+        run: |
+          $eventPayload = '${{ toJson(github) }}'
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get GitHub access token
+        id: github-connect
+        shell: pwsh
+        run: |
+          $token = ./gha-scripts/Get-GitHubAccessToken.ps1 `
+            -AccessTokenIDs "${{ vars.ACCESS_TOKEN_IDS }}" `
+            -ApimBaseUrl "${{ vars.APIM_BASE_URL }}" `
+            -ApimApiKey "${{ secrets.APIM_SUBSCRIPTION_KEY }}"
+
+          echo "::add-mask::$token"
+          echo "token=$token" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8
+
+      - name: Check issue details
+        id: issue
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.github-connect.outputs.token }}
+        run: |
+          $payload = '${{ toJson(github) }}'
+          $Issuenumber = "${{ github.event.inputs.issue-number }}"
+
+          $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
+
+          $today = [DateTimeOffset]::New([TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date).ToUniversalTime(), "Asia/Seoul"))
+          $workshop = [DateTimeOffset]::Parse("${{ vars.WORKSHOP_DUE_DATE }}").ToOffset($tz.GetUtcOffset($today))
+
+          $result = $(./gha-scripts/Check-IssueDetails.ps1 `
+            -IssueNumber "${{ github.event.inputs.issue-number }}" `
+            -DueDate "${{ vars.WORKSHOP_DUE_DATE }}" `
+            -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
+
+          $challengeCode = 'WORKSHOP'
+
+          echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubProfile=$($result.githubProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "githubRepository=$($result.githubRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "frontendUrl=$($result.frontendUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "backendUrl=$($result.backendUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          echo "dashboardUrl=$($result.dashboardUrl)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+      - name: Add label - COMPLETED
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+          --add-label "verified" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment to issue - COMPLETED
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          emoji: "+1,rocket"
+          body: |
+            👋🏼 @${{ github.event.issue.user.login }}님!
+
+            사전 워크샵 과제를 완료하셨습니다!
+
+            축하드려요. 🎉🎉🎉
+
+      - name: Remove label - COMPLETED
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+          --remove-label "verifying" \
+          -R ${{ github.event.repository.full_name }}
+
+      - name: Comment and close issue - COMPLETED
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ github.event.issue.number }} \
+            -c "축하드립니다, @${{ github.event.issue.user.login }}님!
+
+            사전 워크샵 과제를 완료하셨습니다!!
+
+            사전 워크샵 과정을 마치고 느꼈던 감정이나 어려웠던 점을 디스코드 채널에 공유해주시면 더욱 좋겠어요.
+
+            앞으로도 화이팅하세요!🎉🎉🎉💪💪💪
+
+             🔹 해커그라운드 운영진 일동 🔹 " \
+            -R ${{ github.event.repository.full_name }}
+
+      - name: Post message to Discord
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        with:
+          args: "GitHub ID @${{ github.event.issue.user.login }}님께서 사전 워크샵 과제를 완료하셨습니다."
+
+      - name: Call Power Automate workflow
+        if: |
+          github.event.comment.user.login == github.event.issue.assignee.login &&
+          contains(${{ github.event.comment.body }}, "/approve")
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.PAU_ON_WORKSHOP_COMPLETED_URL }}
+          method: "POST"
+          data: '{ "githubId": "${{ github.event.issue.user.login }}", "challengeStatus": "COMPLETED", "githubprofile": "${{ steps.issue.outputs.githubProfile }}", "githubrepository": "${{ steps.issue.outputs.githubRepository }}", "frontendurl": "${{ steps.issue.outputs.frontendUrl }}", "backendurl": "${{ steps.issue.outputs.backendUrl }}", "dashboardurl": "${{ steps.issue.outputs.dashboardUrl }}" }'
