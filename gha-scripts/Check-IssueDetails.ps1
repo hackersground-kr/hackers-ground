@@ -119,7 +119,7 @@ $sections | ForEach-Object {
                 $issue.Add("microsoftLearnProfile", $segments[1].Trim())
             }
         }
-    } elseif ($issue.title -eq "사전 워크샵") {
+    } elseif ($issue.title -eq "Workshop") {
         switch ($segments[0].Trim()) {
             "GitHub 프로필 URL" {
                 $issue.Add("githubProfile", $segments[1].Trim())
@@ -180,6 +180,7 @@ $isValidMicrosoftLearnProfile = if ($issueType -eq "CSC") {
     $false
 }
 $isValidGitHubRepository = if ($issueType -eq "WORKSHOP") {
+    $issue.githubRepository = $issue.githubRepository.Split('?')[0]
     $($($issue.githubRepository).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubRepository).Contains("/$gitHubID/") -eq $true)
 } else {
     $false
