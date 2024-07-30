@@ -413,7 +413,7 @@ jobs:
 
             안타깝게도 제출하신 **Dashboard App URL 주소**를 확인할 수 없습니다. 😱
 
-            * 제출 Dashboard App URL: `${{ steps.issue.outputs.backendUrl }}`
+            * 제출 Dashboard App URL: `${{ steps.issue.outputs.dashboardUrl }}`
 
             다시 한 번 Dashboard App URL 주소를 확인해주세요.
 
