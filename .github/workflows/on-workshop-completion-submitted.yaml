@@ -75,7 +75,9 @@ jobs:
           $dateDue = [DateTimeOffset]::Parse($result.dateDue).ToOffset($tz.GetUtcOffset($result.createdAt)).ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 
           $challengeCode = 'WORKSHOP'
+          $issueclose = 'true'
 
+          echo "issueclose=$(issueclose)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "issueNumber=$($result.issueNumber)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "issueType=$($result.issueType)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
@@ -102,7 +104,7 @@ jobs:
           gh issue close ${{ steps.issue.outputs.issueNumber }} \
             -c "아직 과제 제출 기간이 아닙니다! 검증앱 오류로 현재 운영 측에서 대응 중입니다. 디스코드 공지를 기다려주세요." \
             -R ${{ github.event.repository.full_name }}
-            
+
       # - name: Debug issue details
       #   shell: bash
       #   run: |
@@ -569,7 +571,8 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'true'
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          steps.issue.outputs.issueclose =='false'
         id: check-workshop-challenge
         shell: pwsh
         run: |
@@ -622,7 +625,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -636,7 +640,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED'  &&
+          steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
           actions: "create-comment"
@@ -656,7 +661,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -670,7 +676,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID' &&
+          steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
           actions: "create-comment"
@@ -692,7 +699,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -706,7 +714,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'INVALID' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -720,7 +729,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -734,7 +744,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED' &&
+          steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
           actions: "create-comment"
@@ -756,7 +767,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -770,7 +782,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED'
+          steps.check-workshop-challenge.outputs.challengeStatus == 'NOT_COMPLETED' &&
+          steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -784,7 +797,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          (steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' || steps.check-workshop-challenge.outputs.challengeStatus == 'COMPLETED')
+          (steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' || steps.check-workshop-challenge.outputs.challengeStatus == 'COMPLETED') &&
+          steps.issue.outputs.issueclose =='false'
         id: inspector
         shell: pwsh
         run: |
@@ -797,7 +811,8 @@ jobs:
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
           steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
-          (steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' || steps.check-workshop-challenge.outputs.challengeStatus == 'COMPLETED')
+          (steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' || steps.check-workshop-challenge.outputs.challengeStatus == 'COMPLETED') &&
+          steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
           actions: "add-assignees"
@@ -807,7 +822,8 @@ jobs:
 
       - name: Set challenge status
         if: |
-          steps.issue.outputs.issueType == 'WORKSHOP'
+          steps.issue.outputs.issueType == 'WORKSHOP' &&
+          steps.issue.outputs.issueclose =='false'
         id: challenge-status
         shell: pwsh
         run: |
@@ -839,7 +855,8 @@ jobs:
 
       - name: Call Power Automate workflow
         if: |
-          steps.issue.outputs.issueType == 'WORKSHOP'
+          steps.issue.outputs.issueType == 'WORKSHOP' &&
+          steps.issue.outputs.issueclose =='false'
         uses: fjogeleit/http-request-action@v1
         with:
           url: ${{ secrets.PAU_ON_WORKSHOP_SUBMITTED_URL }}
