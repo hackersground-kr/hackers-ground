@@ -94,6 +94,15 @@ jobs:
           echo "dateDue=$dateDue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "isOverdue=$($result.isOverdue)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
 
+      - name: Close issue
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close ${{ steps.issue.outputs.issueNumber }} \
+            -c "아직 과제 제출 기간이 아닙니다! 검증앱 오류로 현재 운영 측에서 대응 중입니다. 디스코드 공지를 기다려주세요." \
+            -R ${{ github.event.repository.full_name }}
+            
       # - name: Debug issue details
       #   shell: bash
       #   run: |
