@@ -1,0 +1,45 @@
+name: Remove deployment history from Azure Subscription
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 */3 * * *"
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  remove_deployment_history:
+    name: Removing deployment history from Azure Subscription
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Azure CLI script
+        uses: azure/login@v2
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZM_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZM_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZM_SUBSCRIPTION_ID }}
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: Remove history
+        shell: pwsh
+        run: |
+          $deploymentlist = az deployment sub list --query "[].name" | ConvertFrom-Json
+          $deploymentlist | ForEach-Object {
+            $deletedeployment = $_
+            az deployment sub delete -n $deletedeployment
+          }
