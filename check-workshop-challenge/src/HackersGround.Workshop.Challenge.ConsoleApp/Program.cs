@@ -9,7 +9,7 @@ var host = Host.CreateDefaultBuilder(args)
                {
                    services.AddHttpClient<IChallengeCheckerService, ChallengeCheckerService>(p =>
                    {
-                       p.Timeout = TimeSpan.FromSeconds(240);
+                       p.Timeout = TimeSpan.FromSeconds(400);
                    });
                })
                .Build();
