@@ -457,7 +457,7 @@ jobs:
           steps.issue.outputs.isValidGitHubRepository == 'true' &&
           steps.issue.outputs.isValidFrontendUrl == 'true' &&
           steps.issue.outputs.isValidBackendUrl == 'true' &&
-          steps.issue.outputs.isValidDashboardUrl == 'true'&&
+          steps.issue.outputs.isValidDashboardUrl == 'true' &&
           steps.issue.outputs.issueclose =='false'
         id: registration-verification
         uses: fjogeleit/http-request-action@v1
@@ -474,7 +474,7 @@ jobs:
           steps.issue.outputs.isValidGitHubRepository == 'true' &&
           steps.issue.outputs.isValidFrontendUrl == 'true' &&
           steps.issue.outputs.isValidBackendUrl == 'true' &&
-          steps.issue.outputs.isValidDashboardUrl == 'true'&&
+          steps.issue.outputs.isValidDashboardUrl == 'true' &&
           steps.issue.outputs.issueclose =='false'
         id: registration-verification-result
         shell: pwsh
@@ -487,7 +487,7 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'false'&&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false' &&
           steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
@@ -501,7 +501,7 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'false'&&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false' &&
           steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
@@ -527,7 +527,7 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'false'&&
+          steps.registration-verification-result.outputs.isValidRegistration == 'false' &&
           steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
@@ -541,7 +541,7 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'true'&&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
           steps.issue.outputs.issueclose =='false'
         shell: bash
         env:
@@ -555,7 +555,7 @@ jobs:
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP' &&
           steps.issue.outputs.isOverdue == 'false' &&
-          steps.registration-verification-result.outputs.isValidRegistration == 'true'&&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
           steps.issue.outputs.issueclose =='false'
         uses: actions-cool/issues-helper@v3
         with:
