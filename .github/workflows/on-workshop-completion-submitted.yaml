@@ -796,6 +796,28 @@ jobs:
           issue-number: ${{ steps.issue.outputs.issueNumber }}
           assignees: ${{ steps.inspector.outputs.githubId }}
 
+      - name: Comment to issue - NOT_COMPLETED
+        if: |
+          steps.issue.outputs.issueType == 'WORKSHOP' &&
+          steps.issue.outputs.isOverdue == 'false' &&
+          steps.registration-verification-result.outputs.isValidRegistration == 'true' &&
+          (steps.check-workshop-challenge.outputs.challengeStatus == 'FAILED' || steps.check-workshop-challenge.outputs.challengeStatus == 'COMPLETED')
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: "create-comment"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.issue.outputs.issueNumber }}
+          body: |
+            👋🏼 @${{ steps.issue.outputs.githubId }} 님!
+
+            확인결과 1차 검증을 통과하셨습니다. 축하드려요.
+
+            배정된 운영진이 1~2일내로 2차 검증하여, 완료 문자와 메일을 전송할 예정입니다.
+
+            잠시만 기다려주세요!
+
+             🔹 해커그라운드 운영진 일동 🔹
+
       - name: Set challenge status
         if: |
           steps.issue.outputs.issueType == 'WORKSHOP'
