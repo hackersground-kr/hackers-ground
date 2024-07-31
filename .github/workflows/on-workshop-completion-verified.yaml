@@ -77,8 +77,8 @@ jobs:
 
       - name: Add label - COMPLETED
         if: |
-          ${{ github.event.comment.user.login }} == ${{ github.event.issue.assignee.login }} &&
-          ${{ github.event.comment.body }} == "/approve"
+          (${{ github.event.comment.user.login }} == ${{ github.event.issue.assignee.login }}) &&
+          (${{ github.event.comment.body }} == "/approve")
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
