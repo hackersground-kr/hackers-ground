@@ -68,6 +68,7 @@ jobs:
           $assigneeid = "${{ github.event.issue.assignee.login }}"
           $comment = "${{ github.event.comment.body }}"
           $invalidcomment = ( $commentid == $assigneeid ) && ( $comment == '/approve')
+
           echo "$invalidcomment"
           
           echo "Comment user login: ${{ github.event.comment.user.login }}"
