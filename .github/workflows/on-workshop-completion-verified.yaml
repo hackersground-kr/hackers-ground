@@ -63,6 +63,9 @@ jobs:
             -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
 
           $challengeCode = 'WORKSHOP'
+
+          $invalidcomment = ("${{ github.event.comment.user.login }}" == "${{ github.event.issue.assignee.login }}") && ("${{ github.event.comment.body }}" == '/approve')
+          echo "$invalidcomment"
           
           echo "Comment user login: ${{ github.event.comment.user.login }}"
           echo "assignee : ${{ github.event.issue.assignee.login }}"
@@ -78,8 +81,7 @@ jobs:
 
       - name: Add label - COMPLETED
         if: |
-          ("${{ github.event.comment.user.login }}" -eq "${{ github.event.issue.assignee.login }}") &&
-          ("${{ github.event.comment.body }}" -eq "/approve")
+
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
