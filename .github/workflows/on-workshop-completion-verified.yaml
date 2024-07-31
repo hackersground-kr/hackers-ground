@@ -64,8 +64,13 @@ jobs:
 
           $challengeCode = 'WORKSHOP'
           
+          echo "Comment user login: ${{ github.event.comment.user.login }}"
+          echo "assignee : ${{ github.event.issue.assignee.login }}"
+          echo "comment : ${{ github.event.comment.body }}"
+
           $which= (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) -and (${{ github.event.comment.body }} -eq "/approve")
-          echo "which=$which"
+          echo "which:$which"
+          
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubProfile=$($result.githubProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
