@@ -69,10 +69,11 @@ jobs:
           $comment = "${{ github.event.comment.body }}"
 
           $invalidcomment = ( $commentid -eq $assigneeid ) -and ( $comment -eq '/approve')
-          
+
           echo "Comment user login: ${{ github.event.comment.user.login }}"
           echo "assignee : ${{ github.event.issue.assignee.login }}"
           echo "comment : ${{ github.event.comment.body }}"
+          echo "invalidcomment : $invalidcomment"
 
           echo "$invalidcomment" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
@@ -151,7 +152,7 @@ jobs:
 
       - name: Call Power Automate workflow
         if: |
-          $invalidcomment == 'True'
+          steps.issue.outputs.invalidcomment == 'True'
         uses: fjogeleit/http-request-action@v1
         with:
           url: ${{ secrets.PAU_ON_WORKSHOP_COMPLETED_URL }}
