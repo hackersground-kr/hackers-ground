@@ -59,7 +59,9 @@ jobs:
 
           $challengeCode = 'WORKSHOP'
           echo "Comment user login: ${{ github.event.comment.user.login }}"
-
+          echo "assignee : ${{ payload.issue.assignee.login }}"
+          echo "comment : ${{ github.event.comment.body }}"
+          
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubProfile=$($result.githubProfile)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
@@ -70,7 +72,7 @@ jobs:
 
       - name: Add label - COMPLETED
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         shell: bash
         env:
@@ -82,7 +84,7 @@ jobs:
 
       - name: Comment to issue - COMPLETED
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         uses: actions-cool/issues-helper@v3
         with:
@@ -99,7 +101,7 @@ jobs:
 
       - name: Remove label - COMPLETED
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         shell: bash
         env:
@@ -111,7 +113,7 @@ jobs:
 
       - name: Comment and close issue - COMPLETED
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         shell: bash
         env:
@@ -131,7 +133,7 @@ jobs:
 
       - name: Post message to Discord
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         uses: Ilshidur/action-discord@master
         env:
@@ -141,7 +143,7 @@ jobs:
 
       - name: Call Power Automate workflow
         if: |
-          github.event.comment.user.login == payload.issue.assignee.login &&
+          ${{ github.event.comment.user.login }} == ${{ payload.issue.assignee.login }} &&
           ${{ github.event.comment.body }} == "/approve"
         uses: fjogeleit/http-request-action@v1
         with:
