@@ -100,6 +100,7 @@ jobs:
       - name: Remove label - COMPLETED
         if: |
           github.event.comment.user.login == payload.issue.assignee.login &&
+          github.event.comment.user.login == github.event.issue.assignee.login &&
           ${{ github.event.comment.body }} == "/approve"
         shell: bash
         env:
