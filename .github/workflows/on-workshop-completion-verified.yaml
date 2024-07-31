@@ -63,7 +63,10 @@ jobs:
             -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
 
           $challengeCode = 'WORKSHOP'
-
+          
+          echo "Comment user login: ${{ github.event.comment.user.login }}"
+          echo "assignee : ${{ github.event.issue.assignee.login }}"
+          echo "comment : ${{ github.event.comment.body }}"
 
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
