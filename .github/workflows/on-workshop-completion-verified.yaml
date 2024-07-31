@@ -66,6 +66,10 @@ jobs:
 
           $invalidcomment = ("${{ github.event.comment.user.login }}" == "${{ github.event.issue.assignee.login }}") && ("${{ github.event.comment.body }}" == '/approve')
           echo "$invalidcomment"
+          
+          echo "Comment user login: ${{ github.event.comment.user.login }}"
+          echo "assignee : ${{ github.event.issue.assignee.login }}"
+          echo "comment : ${{ github.event.comment.body }}"
 
           echo "challengeCode=$challengeCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
           echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
