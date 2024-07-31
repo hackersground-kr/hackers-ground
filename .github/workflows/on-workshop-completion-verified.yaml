@@ -78,7 +78,7 @@ jobs:
       - name: Add label - COMPLETED
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,7 +90,7 @@ jobs:
       - name: Comment to issue - COMPLETED
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         uses: actions-cool/issues-helper@v3
         with:
           actions: "create-comment"
@@ -107,7 +107,7 @@ jobs:
       - name: Remove label - COMPLETED
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +119,7 @@ jobs:
       - name: Comment and close issue - COMPLETED
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -139,7 +139,7 @@ jobs:
       - name: Post message to Discord
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -149,7 +149,7 @@ jobs:
       - name: Call Power Automate workflow
         if: |
           (${{ github.event.comment.user.login }} -eq ${{ github.event.issue.assignee.login }}) &&
-          (${{ github.event.comment.body }} eq "/approve")
+          (${{ github.event.comment.body }} -eq "/approve")
         uses: fjogeleit/http-request-action@v1
         with:
           url: ${{ secrets.PAU_ON_WORKSHOP_COMPLETED_URL }}
