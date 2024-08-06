@@ -17,5 +17,7 @@
 
 [ 팀빌딩은 디스코드에서 진행합니다 ]
 
-1. [디스코드 링크](https://hgrd.kr/discord)
-4. [해커톤 팀빌딩 폼](https://forms.office.com/r/HcXNjyZtJg)
+1. 디스코드 링크
+: https://hgrd.kr/discord
+2. 해커톤 팀빌딩 폼
+: https://forms.office.com/r/HcXNjyZtJg
