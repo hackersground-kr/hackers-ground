@@ -45,6 +45,11 @@
     "teamFinalAdvanced": "hackathon/teamFinalAdvanced",
     "wrapUp": "hackathon/wrapUp"
   },
+  "teambuilding": {
+    "registrationNotFound" : "teambuilding/registrationNotFound",
+    "teambuildingComplete": "teambuilding/teambuildingComplete",
+    "teambuildingFailed": "teambuilding/teambuildingFailed"
+  },
   "participant":{
     "checkParticipants": "participant/checkParticipants"
   }
