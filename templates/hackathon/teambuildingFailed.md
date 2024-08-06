@@ -8,11 +8,11 @@
 
 ## 제출 정보
 
-* 팀 이름 : {{ TEAM_NAME }}
-* 사용할 GitHub 리포지토리 : {{ TEAM_REPO }}
-* 팀원 1 : {{ TEAM_MEMBER_1 }}
-* 팀원 2 : {{ TEAM_MEMBER_2 }}
-* 팀원 3 : {{ TEAM_MEMBER_3 }}
+- 팀 이름 : {{ TEAM_NAME }}
+- 사용할 GitHub 리포지토리 : {{ TEAM_REPO }}
+- 팀원 1 : {{ TEAM_MEMBER_1 }}
+- 팀원 2 : {{ TEAM_MEMBER_2 }}
+- 팀원 3 : {{ TEAM_MEMBER_3 }}
 
 ## 궁금하다면?
 
