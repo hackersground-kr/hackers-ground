@@ -37,6 +37,7 @@
   "hackathon": {
     "announcement": "hackathon/announcement",
     "checkIn": "hackathon/checkIn",
+    "dailyCheckIn": "hackathon/dailyCheckIn",
     "teamBuildingComplete": "hackathon/teamBuildingComplete",
     "teamBuildingFailed": "hackathon/teamBuildingFailed",
     "teamTopic": "hackathon/teamTopic",
@@ -45,11 +46,6 @@
     "teamPitch": "hackathon/teamPitch",
     "teamFinalAdvanced": "hackathon/teamFinalAdvanced",
     "wrapUp": "hackathon/wrapUp"
-  },
-  "teambuilding": {
-    "dailyCheckIn": "teambuilding/dailyCheckIn",
-    "teambuildingComplete": "teambuilding/teambuildingComplete",
-    "teambuildingFailed": "teambuilding/teambuildingFailed"
   },
   "participant":{
     "checkParticipants": "participant/checkParticipants"
