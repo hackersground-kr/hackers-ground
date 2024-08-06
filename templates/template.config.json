@@ -37,6 +37,7 @@
   "hackathon": {
     "announcement": "hackathon/announcement",
     "checkIn": "hackathon/checkIn",
+    "dailyCheckIn": "hackathon/dailyCheckIn",
     "teamBuildingComplete": "hackathon/teamBuildingComplete",
     "teamBuildingFailed": "hackathon/teamBuildingFailed",
     "teamTopic": "hackathon/teamTopic",
