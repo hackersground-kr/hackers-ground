@@ -9,7 +9,7 @@
 [ 팀 구성 ]
 
 1. 팀 이름 : {{ TEAM_NAME }}
-2. 사용할 GitHub 리포지토리 : {{ TEAM_REPO }}
+2. 사용할 GitHub 리포지토리 : {{ TEAM_REPO }} (해커톤 당일 체크인 후 생성)
 3. 팀원 1 : {{ TEAM_MEMBER_1 }}
 4. 팀원 2 : {{ TEAM_MEMBER_2 }}
 5. 팀원 3 : {{ TEAM_MEMBER_3 }}
