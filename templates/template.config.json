@@ -46,7 +46,7 @@
     "wrapUp": "hackathon/wrapUp"
   },
   "teambuilding": {
-    "registrationNotFound" : "teambuilding/registrationNotFound",
+    "dailyCheckIn": "teambuilding/dailyCheckIn",
     "teambuildingComplete": "teambuilding/teambuildingComplete",
     "teambuildingFailed": "teambuilding/teambuildingFailed"
   },
