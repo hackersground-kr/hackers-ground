@@ -37,7 +37,8 @@
   "hackathon": {
     "announcement": "hackathon/announcement",
     "checkIn": "hackathon/checkIn",
-    "teamBuilding": "hackathon/teamBuilding",
+    "teamBuildingComplete": "hackathon/teamBuildingComplete",
+    "teamBuildingFailed": "hackathon/teamBuildingFailed",
     "teamTopic": "hackathon/teamTopic",
     "teamApp1": "hackathon/teamApp1",
     "teamApp2": "hackathon/teamApp2",
