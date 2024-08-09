@@ -38,6 +38,7 @@
     "announcement": "hackathon/announcement",
     "checkIn": "hackathon/checkIn",
     "dailyCheckIn": "hackathon/dailyCheckIn",
+    "teamBuildingAnnounce": "hackathon/teamBuildingAnnounce",
     "teamBuildingComplete": "hackathon/teamBuildingComplete",
     "teamBuildingFailed": "hackathon/teamBuildingFailed",
     "teamTopic": "hackathon/teamTopic",
