@@ -15,7 +15,6 @@
     * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL
 * (가산점 사항) 클라우드 네이티브 앱 개발시 
     * Azure Container Apps
-    * Azure Kubernetes Services
 
 
 ### 참고 레퍼런스 리스트업
@@ -38,8 +37,9 @@
 
 ### 결선 진출 조건
 
-* GitHub Actions / Bicep 활용 배포 자동화 구축
 * 서비스 배포 문서 작성 후 검증단 검수
+    * (가산점 사항)GitHub Actions / Bicep 활용 배포 자동화 구축
+
 
 
 ## 라운드 소개
