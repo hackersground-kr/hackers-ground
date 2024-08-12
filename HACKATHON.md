@@ -12,7 +12,7 @@
         * 웹 기반 앱 서비스
         * 모바일 **"웹"** 앱
     * PaaS 또는 서버리스 데이터베이스
-        * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL
+        * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL 등
 * (가산점 사항) 클라우드 네이티브 앱 개발시 
     * Azure Container Apps
 
