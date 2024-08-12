@@ -13,9 +13,9 @@
         * 모바일 **"웹"** 앱
     * PaaS 또는 서버리스 데이터베이스
         * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL 등
-* GitHub Actions / Bicep 활용 배포 자동화 구축
 * (가산점 사항) 클라우드 네이티브 앱 개발시 
     * Azure Container Apps
+* (가산점 사항) GitHub Actions / Bicep 활용 배포 자동화 구축
 
 
 ### 참고 레퍼런스 리스트업
