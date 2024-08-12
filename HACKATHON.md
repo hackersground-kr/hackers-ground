@@ -9,17 +9,17 @@
 
 * Microsoft Azure 클라우드 기반
     * PaaS 또는 서버리스 앱 서비스
-    * 웹 기반 앱 서비스
-    * 모바일 **"웹"** 앱
+        * 웹 기반 앱 서비스
+        * 모바일 **"웹"** 앱
     * PaaS 또는 서버리스 데이터베이스
-    * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL
+        * Table Storage, Cosmos DB, Azure SQL 또는 PostgreSQL
 * (가산점 사항) 클라우드 네이티브 앱 개발시 
     * Azure Container Apps
 
 
 ### 참고 레퍼런스 리스트업
 
-위 사용 기술스택에 참고할 레퍼런스 문서를 정리했습니다. 참가자분들은 첨부된 문서를 시작으로 [Microsoft Learn](https://learn.microsoft.com/ko-kr/) 플랫폼에서 위 기술스택 키워드로 검색해 관련 기술을 파악합니다.
+위 사용 기술스택에 참고할 레퍼런스 문서를 정리했습니다. 참가자분들은 첨부된 문서를 시작으로 [Microsoft Learn](https://learn.microsoft.com/ko-kr/) 플랫폼에서 위 기술스택 키워드로 검색해 관련 기술을 파악합니다. 아래 링크는 예시일 뿐 전부가 아닙니다. Azure PaaS, 서버리스 등과 관련해 필요한 자료는 추가적으로 더 찾아서 준비하는 것이 좋습니다.
 
 * https://learn.microsoft.com/ko-kr/azure/app-service/
 * https://learn.microsoft.com/ko-kr/training/paths/deploy-a-website-with-azure-app-service/
