@@ -1,0 +1,35 @@
+name: 'ROUND 2: 팀 주제 제출'
+description: '팀별 주제 제출 템플릿'
+title: "[**팀 이름**] 해커톤 주제 제출"
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      **👆👆👆 상단의 제목에 팀 이름을 반드시 적어 주세요 👆👆👆**
+
+- type: dropdown
+  id: title
+  attributes:
+    label: '제목'
+    options:
+      - '팀 주제 제출'
+    default: 0
+
+- type: input
+  id: team_name
+  attributes:
+    label: '팀 이름'
+    description: '팀 이름을 입력해 주세요'
+    placeholder: '팀 이름을 입력해 주세요'
+  validations:
+    required: true
+
+- type: input
+  id: team_repository
+  attributes:
+    label: '팀 리포지토리'
+    description: '팀 리포지토리 주소를 입력해 주세요. (예: https://github.com/hackersground-kr/my-awesome-team)'
+    placeholder: '팀 리포지토리 주소를 입력해 주세요. (예: https://github.com/hackersground-kr/my-awesome-team)'
+  validations:
+    required: true
