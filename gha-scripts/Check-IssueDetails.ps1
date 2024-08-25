@@ -76,12 +76,14 @@ if ($eventName -eq "workflow_dispatch") {
     $body = $GitHubPayload.body
     $title = $GitHubPayload.title
     $githubID = $GitHubPayload.user.login
+    $assignee = $GitHubPayload.assignee
     $createdAt = $GitHubPayload.created_at.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 } else {
     $IssueNumber = $GitHubPayload.event.issue.number
     $body = $GitHubPayload.event.issue.body
     $title = $GitHubPayload.event.issue.title
     $githubID = $GitHubPayload.event.issue.user.login
+    $assignee = $GitHubPayload.event.issue.assignee
     $createdAt = $GitHubPayload.event.issue.created_at.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 }
 
@@ -97,8 +99,10 @@ $issue.title = if ($issue.title -eq "클라우드 스킬 챌린지") {
     "Workshop"
 } elseif ($issue.title -eq "팀 주제 제출") {
     "Team Topic"
-} elseif ($issue.title -eq "팀 앱 제출") {
-    "Team App"
+} elseif ($issue.title -eq "팀 앱 제출 1차") {
+    "Team App 1"
+} elseif ($issue.title -eq "팀 앱 제출 2차") {
+    "Team App 2"
 } elseif ($issue.title -eq "팀 발표자료 제출") {
     "Team Pitch"
 } else {
@@ -153,7 +157,8 @@ $issueType = switch ($issue.title) {
     "Cloud Skills Challenge" { "CSC" }
     "Workshop" { "WORKSHOP" }
     "Team Topic" { "TOPIC" }
-    "Team App" { "APP" }
+    "Team App 1" { "APP1" }
+    "Team App 2" { "APP2" }
     "Team Pitch" { "PITCH" }
     default { $null }
 }
@@ -172,33 +177,45 @@ $isOverdue = "$($dateSubmitted -gt $dateDue)".ToLowerInvariant()
 $dateSubmittedValue = $dateSubmitted.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 $dateDueValue = $dateDue.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
 
-$issue.githubProfile = $issue.githubProfile.Split('?')[0] 
-$isValidGitHubProfile = $($($issue.githubProfile).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubProfile).TrimEnd("/").EndsWith($githubID) -eq $true)
-$isValidMicrosoftLearnProfile = if ($issueType -eq "CSC") {
-    $($issue.microsoftLearnProfile).StartsWith("https://learn.microsoft.com/ko-kr/users/") -eq $true
+if (($issueType -eq "TOPIC") -or ($issueType -eq "APP1") -or ($issueType -eq "APP2") -or ($issueType -eq "PITCH")) {
+    $isValidTeamRepository = $($issue.teamRepository).StartsWith("https://github.com/hackersground-kr/") -eq $true
+
+    $segments = $issue.teamRepository.Split('/', [System.StringSplitOptions]::RemoveEmptyEntries)
+    $issue.teamRepository = $segments[$segments.Length - 1]
 } else {
-    $false
-}
-$isValidGitHubRepository = if ($issueType -eq "WORKSHOP") {
-    $issue.githubRepository = $issue.githubRepository.Split('?')[0]
-    $($($issue.githubRepository).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubRepository).Contains("/$gitHubID/") -eq $true)
-} else {
-    $false
-}
-$isValidFrontendUrl = if ($issueType -eq "WORKSHOP") {
-    $($($issue.frontendUrl).StartsWith("https://")) -and $($($issue.frontendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
- } else {
-    $false
-}
-$isValidBackendUrl = if ($issueType -eq "WORKSHOP") {
-    $($($issue.backendUrl).StartsWith("https://")) -and $($($issue.backendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
-} else {
-    $false
-}
-$isValidDashboardUrl = if ($issueType -eq "WORKSHOP") {
-    $($($issue.dashboardUrl).StartsWith("https://")) -and $($($issue.dashboardUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
-} else {
-    $false
+    $issue.githubProfile = $issue.githubProfile.Split('?')[0] 
+    $isValidGitHubProfile = $($($issue.githubProfile).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubProfile).TrimEnd("/").EndsWith($githubID) -eq $true)
+    $isValidMicrosoftLearnProfile = if ($issueType -eq "CSC") {
+        $($issue.microsoftLearnProfile).StartsWith("https://learn.microsoft.com/ko-kr/users/") -eq $true
+    } else {
+        $false
+    }
+    $isValidGitHubRepository = if ($issueType -eq "WORKSHOP") {
+        $issue.githubRepository = $issue.githubRepository.Split('?')[0]
+        $($($issue.githubRepository).StartsWith("https://github.com/") -eq $true) -and $($($issue.githubRepository).Contains("/$gitHubID/") -eq $true)
+    } else {
+        $false
+    }
+    $isValidFrontendUrl = if ($issueType -eq "WORKSHOP") {
+        $($($issue.frontendUrl).StartsWith("https://")) -and $($($issue.frontendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
+     } else {
+        $false
+    }
+    $isValidBackendUrl = if ($issueType -eq "WORKSHOP") {
+        $($($issue.backendUrl).StartsWith("https://")) -and $($($issue.backendUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
+    } else {
+        $false
+    }
+    $isValidDashboardUrl = if ($issueType -eq "WORKSHOP") {
+        $($($issue.dashboardUrl).StartsWith("https://")) -and $($($issue.dashboardUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
+    } else {
+        $false
+    }
+    $isValidDashboardUrl = if ($issueType -eq "WORKSHOP") {
+        $($($issue.dashboardUrl).StartsWith("https://")) -and $($($issue.dashboardUrl).TrimEnd("/").EndsWith(".azurecontainerapps.io"))
+    } else {
+        $false
+    }
 }
 
 $result = @{
@@ -224,33 +241,40 @@ $result = @{
     isValidBackendUrl = $isValidBackendUrl;
     dashboardUrl = $issue.dashboardUrl;
     isValidDashboardUrl = $isValidDashboardUrl;
+    teamName = $issue.teamName;
+    teamRepository = $issue.teamRepository;
+    isValidTeamRepository = $isValidTeamRepository;
+    assignee = $assignee;
 }
 
 Write-Output $($result | ConvertTo-Json -Depth 100)
 
-Remove-Variable result
-Remove-Variable isValidDashboardUrl
-Remove-Variable isValidBackendUrl
-Remove-Variable isValidFrontendUrl
-Remove-Variable isValidGitHubRepository
-Remove-Variable isValidMicrosoftLearnProfile
-Remove-Variable isValidGitHubProfile
-Remove-Variable dateDueValue
-Remove-Variable dateSubmittedValue
-Remove-Variable isOverdue
-Remove-Variable dateDue
-Remove-Variable dateSubmitted
-Remove-Variable offset
-Remove-Variable tz
-Remove-Variable isValidChallengeCode
-Remove-Variable issueType
-Remove-Variable issue
-Remove-Variable segments
-Remove-Variable sections
-Remove-Variable createdAt
-Remove-Variable githubID
-Remove-Variable title
-Remove-Variable body
-Remove-Variable accessToken
-Remove-Variable eventName
-Remove-Variable needHelp
+# Remove-Variable result
+# Remove-Variable isValidTeamRepository
+# Remove-Variable teamRepository
+# Remove-Variable teamName
+# Remove-Variable isValidDashboardUrl
+# Remove-Variable isValidBackendUrl
+# Remove-Variable isValidFrontendUrl
+# Remove-Variable isValidGitHubRepository
+# Remove-Variable isValidMicrosoftLearnProfile
+# Remove-Variable isValidGitHubProfile
+# Remove-Variable dateDueValue
+# Remove-Variable dateSubmittedValue
+# Remove-Variable isOverdue
+# Remove-Variable dateDue
+# Remove-Variable dateSubmitted
+# Remove-Variable offset
+# Remove-Variable tz
+# Remove-Variable isValidChallengeCode
+# Remove-Variable issueType
+# Remove-Variable issue
+# Remove-Variable segments
+# Remove-Variable sections
+# Remove-Variable createdAt
+# Remove-Variable githubID
+# Remove-Variable title
+# Remove-Variable body
+# Remove-Variable accessToken
+# Remove-Variable eventName
+# Remove-Variable needHelp
