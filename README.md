@@ -54,6 +54,8 @@
 
 - **내용:** 무박 3일 동안 즐겁게 코딩하며 클라우드로 IT 서비스를 구축, 배포, 운영합니다.
 - **해커톤:** [해커톤 안내](https://hgrd.kr/hackathon-guide)
+- **Azure Open AI 접근 링크:** [접근 링크](https://hgrd.kr/openai-access)
+  - "DeploymentName"은 model-gpt4o-20240513 로 설정해주세요.
 
 해커그라운드 해커톤 2024와 함께 클라우드 기술로 지역사회 문제를 해결하고, 개발자로서 성장할 수 있는 기회를 놓치지 마세요! 많은 참여 바랍니다.
 
