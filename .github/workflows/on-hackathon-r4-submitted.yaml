@@ -1,0 +1,200 @@
+name: 'On Hackathon Team App 2 Submitted'
+
+on:
+  issues:
+    types:
+    - opened
+  workflow_dispatch:
+    inputs:
+      issue-number:
+        description: 'Issue number'
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  verification-start:
+    name: 'Starting verification'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check event payload
+      shell: pwsh
+      run: |
+        $eventPayload = '${{ toJson(github) }}'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get GitHub access token
+      id: github-connect
+      shell: pwsh
+      run: |
+        $token = ./gha-scripts/Get-GitHubAccessToken.ps1 `
+          -AccessTokenIDs "${{ vars.ACCESS_TOKEN_IDS }}" `
+          -ApimBaseUrl "${{ vars.APIM_BASE_URL }}" `
+          -ApimApiKey "${{ secrets.APIM_SUBSCRIPTION_KEY }}"
+
+        echo "::add-mask::$token"
+        echo "token=$token" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8
+
+    - name: Check issue details
+      id: issue
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ steps.github-connect.outputs.token }}
+      run: |
+        $payload = '${{ toJson(github) }}'
+        $Issuenumber = "${{ github.event.inputs.issue-number }}"
+
+        $result = $(./gha-scripts/Check-IssueDetails.ps1 `
+          -IssueNumber "${{ github.event.inputs.issue-number }}" `
+          -DueDate "${{ vars.HACKATHON_R4_DUE_DATE }}" `
+          -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
+
+        $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Asia/Seoul")
+        $dateSubmitted = [DateTimeOffset]::Parse($result.dateSubmitted).ToOffset($tz.GetUtcOffset($result.createdAt)).ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
+        $dateDue = [DateTimeOffset]::Parse($result.dateDue).ToOffset($tz.GetUtcOffset($result.createdAt)).ToString("yyyy-MM-ddTHH:mm:ss.fffzzz")
+
+        echo "issueNumber=$($result.issueNumber)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "issueType=$($result.issueType)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "dateSubmitted=$dateSubmitted" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "dateDue=$dateDue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "isOverdue=$($result.isOverdue)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "teamName=$($result.teamName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "teamRepository=$($result.teamRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "isValidTeamRepository=$($result.isValidTeamRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "assignee=$($result.assignee)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+    - name: Debug issue details
+      shell: bash
+      run: |
+        echo "Issue number: ${{ steps.issue.outputs.issueNumber }}"
+        echo "Issue type: ${{ steps.issue.outputs.issueType }}"
+        echo "GitHub ID: ${{ steps.issue.outputs.githubID }}"
+        echo "Date submitted: ${{ steps.issue.outputs.dateSubmitted }}"
+        echo "Date due: ${{ steps.issue.outputs.dateDue }}"
+        echo "Is overdue: ${{ steps.issue.outputs.isOverdue }}"
+        echo "Team name: ${{ steps.issue.outputs.teamName }}"
+        echo "Team repository: ${{ steps.issue.outputs.teamRepository }}"
+        echo "Assignee: ${{ steps.issue.outputs.assignee }}"
+
+    - name: Add a label - Overdue
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "round-4,hackathon,team-apps,overdue" \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Comment to issue - Overdue
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'true'
+      uses: actions-cool/issues-helper@v3
+      with:
+        actions: 'create-comment'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ steps.issue.outputs.issueNumber }}
+        body: |
+          👋🏼 @${{ steps.issue.outputs.githubID }} 님!
+
+          * 이슈 제출 시각: ${{ steps.issue.outputs.dateSubmitted }}
+          * 이슈 마감 시각: ${{ steps.issue.outputs.dateDue }}
+
+          안타깝게도 제출하신 이슈는 마감 기한인 ${{ steps.issue.outputs.dateDue }}을 넘기셨습니다. 😭 따라서, 향후 심사시 감점 요소로 작용하게 됩니다.
+
+          하지만, 그렇다고 해서 해커톤이 끝난 건 아니잖아요? 다음 라운드가 더 중요합니다! 💪
+          
+          부지런히 코딩하고, 팀원들과 소통하며, 더 좋은 결과물을 만들어봅시다. 🚀 그리고 필요하면 기술 멘토님과 비기술 멘토님들께 도움을 요청하세요. 🙏
+
+    - name: Close issue - Overdue
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue close ${{ steps.issue.outputs.issueNumber }} \
+          -c "제출 기한을 넘겼습니다. 이슈를 닫습니다." \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Add a label - Acknowledge
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'false'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "round-4,hackathon,team-apps,submitted,verifying" \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Get random inspector
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'false'
+      id: inspector
+      shell: pwsh
+      run: |
+        $inspector = if ("${{ steps.issue.outputs.assignee }}" -eq "") {
+          ./get-randomassignee/Get-RandomAssignee.ps1 -Assignees "${{ vars.INSPECTORS }}"
+        } else {
+          "${{ steps.issue.outputs.assignee }}"
+        }
+
+        echo "githubID=$inspector" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+
+    - name: Assign an inspector
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'false'
+      uses: actions-cool/issues-helper@v3
+      with:
+        actions: 'add-assignees'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ steps.issue.outputs.issueNumber }}
+        assignees: ${{ steps.inspector.outputs.githubID }}
+
+    - name: Comment to issue - Acknowledge
+      if: |
+        steps.issue.outputs.issueType == 'APP2' &&
+        steps.issue.outputs.isOverdue == 'false'
+      uses: actions-cool/issues-helper@v3
+      with:
+        actions: 'create-comment'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ steps.issue.outputs.issueNumber }}
+        emoji: '+1,rocket'
+        body: |
+          👋🏼 @${{ steps.issue.outputs.githubID }} 님!
+
+          해커톤 앱을 제출해 주셔서 감사합니다.
+
+          @${{ steps.inspector.outputs.githubID }} 님께서 최대한 빠르게 확인해 드리겠습니다! 😊
+
+          계속해서 앱을 개발해 주세요! 💪 저희가 앱이 잘 작동하는지 검증한 후 결과를 말씀드리겠습니다.
+          
+          부지런히 코딩하고, 팀원들과 소통하며, 더 좋은 결과물을 만들어봅시다. 🚀 그리고 필요하면 기술 멘토님과 비기술 멘토님들께 도움을 요청하세요. 🙏
+
+    - name: Call Power Automate workflow
+      if: |
+        steps.issue.outputs.issueType == 'APP2'
+      id: request
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: ${{ secrets.PAU_ON_ROUND_4_SUBMITTED_URL }}
+        method: 'POST'
+        data: '{ "issueNumber": ${{ steps.issue.outputs.issueNumber }}, "githubId": "${{ steps.issue.outputs.githubID }}", "teamName": "${{ steps.issue.outputs.teamName }}", "repositoryName": "${{ steps.issue.outputs.teamRepository }}", "dateSubmitted": "${{ steps.issue.outputs.dateSubmitted }}", "dateDue": "${{ steps.issue.outputs.dateDue }}", "isOverdue": ${{ steps.issue.outputs.isOverdue }} }'
