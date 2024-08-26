@@ -1,0 +1,191 @@
+name: On Hackathon Team App 1 Verified
+
+on:
+  issue_comment:
+    types:
+    - created
+  workflow_dispatch:
+    inputs:
+      issue-number:
+        description: 'Issue number'
+        required: true
+        default: ''
+      inspected:
+        description: 'Value indicating whether the verification process done by human or not'
+        required: true
+        default: 'false'
+      verified:
+        description: 'Value indicating whether the verification process is successful or not'
+        required: true
+        default: 'false'
+      onlyissueclose:
+        description: 'Value indicating whether the issue should be closed or not'
+        required: true
+        default: 'true'
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  verification-start:
+    name: 'Completing verification'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check event payload
+      shell: pwsh
+      run: |
+        $eventPayload = '${{ toJson(github) }}'
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get GitHub access token
+      id: github-connect
+      shell: pwsh
+      run: |
+        $token = ./gha-scripts/Get-GitHubAccessToken.ps1 `
+          -AccessTokenIDs "${{ vars.ACCESS_TOKEN_IDS }}" `
+          -ApimBaseUrl "${{ vars.APIM_BASE_URL }}" `
+          -ApimApiKey "${{ secrets.APIM_SUBSCRIPTION_KEY }}"
+
+        echo "::add-mask::$token"
+        echo "token=$token" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8
+
+    - name: Check issue details
+      id: issue
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ steps.github-connect.outputs.token }}
+      run: |
+        $payload = '${{ toJson(github) }}'
+        $Issuenumber = "${{ github.event.inputs.issue-number }}"
+
+        $result = $(./gha-scripts/Check-IssueDetailsForRoundVerification.ps1 `
+          -IssueNumber "${{ github.event.inputs.issue-number }}" `
+          -GitHubPayload $($payload | ConvertFrom-Json)) | ConvertFrom-Json
+
+        if ("${{ github.event_name}}" -eq "workflow_dispatch") {
+          $verified = ("${{ github.event.inputs.verified }}".ToLowerInvariant() -eq "true") ? "true" : "false"
+          $invalid = ""
+        } else {
+          $verified = ("${{ github.event.comment.body }}".StartsWith("/ok")) ? "true" : "false"
+          $invalid = ("${{ github.event.comment.body }}".StartsWith("/invalid")) ? "true" : ""
+          $invalid = ("${{ github.event.comment.user.login }}" -eq "${{ github.event.issue.assignee.login }}") ? "" : "true"
+        }
+
+        echo "issueNumber=$($result.issueNumber)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "issueType=$($result.issueType)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "githubID=$($result.githubID)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "assignee=$($result.assignee)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "title=$($result.title)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "teamName=$($result.teamName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "teamRepository=$($result.teamRepository)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "verified=$verified" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        echo "invalid=$invalid" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+        
+    - name: Add a label - NOT Verified
+      if: |
+         steps.issue.outputs.issueType == 'APP1' &&
+         (steps.issue.outputs.verified == 'false' || steps.issue.outputs.invalid == 'true' || github.event.comment.user.login != github.event.issue.assignee.login)
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "invalid" \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Comment to issue - NOT Verified
+      if: |
+        steps.issue.outputs.issueType == 'APP1' &&
+        (steps.issue.outputs.verified == 'false' || steps.issue.outputs.invalid == 'true' || github.event.comment.user.login != github.event.issue.assignee.login ) &&
+        github.event.inputs.onlyissueclose != 'false'
+      uses: actions-cool/issues-helper@v3
+      with:
+        actions: 'create-comment'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ steps.issue.outputs.issueNumber }}
+        emoji: 'confused,eyes'
+        body: |
+          👋🏼 @${{ steps.issue.outputs.githubID }} 님!
+
+          팀 앱 제출을 확인하는 과정에서 문제가 발생했습니다. 😢
+
+          곧바로 사무국을 찾아가서 문제를 해결해주세요. 🙏
+
+    - name: Close issue - NOT Verified
+      if: |
+       steps.issue.outputs.issueType == 'APP1' &&
+        (steps.issue.outputs.verified == 'false' || steps.issue.outputs.invalid == 'true' || github.event.comment.user.login != github.event.issue.assignee.login )
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue close ${{ steps.issue.outputs.issueNumber }} \
+          -c "이슈를 확인할 수 없습니다. 이슈를 닫습니다." \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Add a label - Verified
+      if: |
+        steps.issue.outputs.issueType == 'APP1' &&
+        steps.issue.outputs.verified == 'true' &&
+        github.event_name != 'workflow_dispatch'  &&
+        github.event.comment.user.login == github.event.issue.assignee.login
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue edit ${{ steps.issue.outputs.issueNumber }} \
+          --add-label "verified" \
+          --remove-label "verifying,invalid" \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Comment to issue - Verified
+      if: |
+        steps.issue.outputs.issueType == 'APP1' &&
+        steps.issue.outputs.verified == 'true' &&
+        github.event_name != 'workflow_dispatch' &&
+        github.event.comment.user.login == github.event.issue.assignee.login
+      uses: actions-cool/issues-helper@v3
+      with:
+        actions: 'create-comment'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ steps.issue.outputs.issueNumber }}
+        emoji: 'hooray'
+        body: |
+          👋🏼 @${{ steps.issue.outputs.githubID }} 님!
+
+          팀 앱 제출 확인이 끝났습니다. 축하드립니다! 🎉
+
+          계속해서 앱을 개발해 주세요! 💪 끝날 때 까지 끝난 게 아닙니다.
+          
+          부지런히 코딩하고, 팀원들과 소통하며, 더 좋은 결과물을 만들어봅시다. 🚀 그리고 필요하면 기술 멘토님과 비기술 멘토님들께 도움을 요청하세요. 🙏
+
+    - name: Close issue - Verified
+      if: |
+        steps.issue.outputs.issueType == 'APP1' &&
+        steps.issue.outputs.verified == 'true' &&
+        github.event_name != 'workflow_dispatch'  &&
+        github.event.comment.user.login == github.event.issue.assignee.login
+      shell: bash
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh issue close ${{ steps.issue.outputs.issueNumber }} \
+          -c "팀 앱 제출을 확인했습니다. 이슈를 닫습니다." \
+          -R ${{ github.event.repository.full_name }}
+
+    - name: Call Power Automate workflow
+      if: |
+        steps.issue.outputs.issueType == 'APP1'
+      id: request
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: ${{ secrets.PAU_ON_ROUND_3_VERIFIED_URL }}
+        method: 'POST'
+        data: '{ "issueNumber": ${{ steps.issue.outputs.issueNumber }}, "githubId": "${{ steps.issue.outputs.githubID }}", "teamName": "${{ steps.issue.outputs.teamName }}", "repositoryName": "${{ steps.issue.outputs.teamRepository }}", "verified": "${{ steps.issue.outputs.verified }}", "invalid": "${{ steps.issue.outputs.invalid }}", "onlyissueclose": "${{ github.event.inputs.onlyissueclose }}" }'
